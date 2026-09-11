@@ -1,0 +1,48 @@
+column_name,tier,feature_id,description,formula_short,input,units,range,spec_section
+RID,,,Subject identifier (ADNI Roster ID). Merge key against survival outcome.,-,-,integer,4..1427,-
+A_area,A,A1,Polygon area of the CC midsagittal contour,A = 0.5 * |sum_i(x_i * y_{i+1} - x_{i+1} * y_i)|  (shoelace),Ldata,pixel^2,positive,Tier A
+A_perimeter,A,A2,Polygon perimeter,P = sum_i ||p_{i+1} - p_i||,Ldata,pixel,positive,Tier A
+A_pa_ratio,A,A3,Perimeter-to-area ratio,P / A,Ldata,1/pixel,positive,Tier A
+A_sphericity,A,A4,2D IBSI sphericity,sqrt(4*pi*A) / P,derived (A1 + A2),dimensionless,"(0, 1]",Tier A
+A_max_diameter,A,A5,Maximum pairwise landmark distance,max_{i,j} ||p_i - p_j||,Ldata,pixel,positive,Tier A
+A_major_axis,A,A6,Major axis length of best-fit ellipse via area-based second central moments,4 * sqrt(lambda_max(Sigma_area)),Ldata mask,pixel,positive,Tier A
+A_minor_axis,A,A7,Minor axis length of best-fit ellipse via area-based second central moments,4 * sqrt(lambda_min(Sigma_area)),Ldata mask,pixel,positive,Tier A
+A_elongation,A,A8,IBSI elongation (axis ratio),sqrt(lambda_min / lambda_max) = A_minor_axis / A_major_axis,derived (A6 + A7),dimensionless,"(0, 1]",Tier A
+A_roundness,A,A9,Roundness from maximum diameter,4 * A / (pi * d_max^2),derived (A1 + A5),dimensionless,"(0, 1]",Tier A
+B_solidity,B,B1,Solidity (polygon area / convex-hull area),A / A_hull,Lr,dimensionless,"(0, 1]",Tier B
+B_convexity,B,B2,Convexity (convex-hull perimeter / polygon perimeter),P_hull / P,Lr,dimensionless,"(0, 1]",Tier B
+B_extent_obb,B,B3,Fraction of oriented-bounding-box area filled by the contour,A / (w_obb * h_obb),Lr,dimensionless,"(0, 1]",Tier B
+B_aspect_obb,B,B4,Oriented-bounding-box aspect ratio,max(w_obb, h_obb) / min(w_obb, h_obb),Lr,dimensionless,>= 1,Tier B
+C_kappa_mean_abs,C,C1,Arc-length-weighted mean of |Menger curvature|,(1/L) * sum_i |kappa_i| * ds_i,Lr,1/(unit length),positive,Tier C
+C_kappa_sd,C,C2,Arc-length-weighted standard deviation of curvature,sqrt((1/L) * sum_i (kappa_i - mean_signed)^2 * ds_i),Lr,1/(unit length),non-negative,Tier C
+C_kappa_max,C,C3,Maximum |Menger curvature| over all landmarks,max_i |kappa_i|,Lr,1/(unit length),positive,Tier C
+C_bending_energy,C,C4,Discrete bending energy integral of curvature squared,sum_i kappa_i^2 * ds_i,Lr,1/(unit length),positive,Tier C
+C_total_abs_curvature,C,C5,Discrete integral of |curvature|; >= 2*pi for smooth simple closed curves (Hopf),sum_i |kappa_i| * ds_i,Lr,dimensionless,positive (>= 2*pi smooth),Tier C
+D_hu_1,D,D1,Log-magnitude Hu invariant moment h1 = eta_20 + eta_02,sign(h1) * log10(|h1| + 1e-12),Lr mask,dimensionless,real,Tier D
+D_hu_2,D,D2,Log-magnitude Hu invariant moment h2 = (eta_20 - eta_02)^2 + 4 * eta_11^2,sign(h2) * log10(|h2| + 1e-12),Lr mask,dimensionless,real,Tier D
+D_hu_3,D,D3,Log-magnitude Hu invariant moment h3 (third-order),sign(h3) * log10(|h3| + 1e-12),Lr mask,dimensionless,real,Tier D
+D_hu_4,D,D4,Log-magnitude Hu invariant moment h4 (third-order),sign(h4) * log10(|h4| + 1e-12),Lr mask,dimensionless,real,Tier D
+D_hu_5,D,D5,Log-magnitude Hu invariant moment h5 (third-order),sign(h5) * log10(|h5| + 1e-12),Lr mask,dimensionless,real,Tier D
+D_hu_6,D,D6,Log-magnitude Hu invariant moment h6 (third-order),sign(h6) * log10(|h6| + 1e-12),Lr mask,dimensionless,real,Tier D
+D_hu_7,D,D7,Log-magnitude Hu invariant moment h7; flips sign under reflection,sign(h7) * log10(|h7| + 1e-12),Lr mask,dimensionless,real (sign reflects mirroring),Tier D
+E_efd_r2,E,E2,Elliptic Fourier amplitude at harmonic 2 normalised by harmonic 1,A_2 / A_1 with A_n = sqrt(0.5 * (a_n^2 + b_n^2 + c_n^2 + d_n^2)),Lr,dimensionless,non-negative,Tier E
+E_efd_r3,E,E3,Elliptic Fourier amplitude at harmonic 3 normalised by harmonic 1,A_3 / A_1,Lr,dimensionless,non-negative,Tier E
+E_efd_r4,E,E4,Elliptic Fourier amplitude at harmonic 4 normalised by harmonic 1,A_4 / A_1,Lr,dimensionless,non-negative,Tier E
+E_efd_r5,E,E5,Elliptic Fourier amplitude at harmonic 5 normalised by harmonic 1,A_5 / A_1,Lr,dimensionless,non-negative,Tier E
+E_efd_r6,E,E6,Elliptic Fourier amplitude at harmonic 6 normalised by harmonic 1,A_6 / A_1,Lr,dimensionless,non-negative,Tier E
+E_efd_r7,E,E7,Elliptic Fourier amplitude at harmonic 7 normalised by harmonic 1,A_7 / A_1,Lr,dimensionless,non-negative,Tier E
+E_efd_r8,E,E8,Elliptic Fourier amplitude at harmonic 8 normalised by harmonic 1,A_8 / A_1,Lr,dimensionless,non-negative,Tier E
+E_efd_r9,E,E9,Elliptic Fourier amplitude at harmonic 9 normalised by harmonic 1,A_9 / A_1,Lr,dimensionless,non-negative,Tier E
+E_efd_r10,E,E10,Elliptic Fourier amplitude at harmonic 10 normalised by harmonic 1,A_10 / A_1,Lr,dimensionless,non-negative,Tier E
+F_R1_thickness,F,F1.T,"Posterior (splenium) slab v-extent thickness; region 1 of 5 in the fixed antero-posterior partition",max_{i in S_1} v_i - min_{i in S_1} v_i,Lr,dimensionless,positive,Tier F
+F_R1_kappa,F,F1.kappa,Mean |Menger kappa| over landmarks in the posterior slab,(1 / |S_1|) * sum_{i in S_1} |kappa_i|,Lr,1/(unit length),positive,Tier F
+F_R2_thickness,F,F2.T,Mid-posterior slab v-extent thickness,max_{i in S_2} v_i - min_{i in S_2} v_i,Lr,dimensionless,positive,Tier F
+F_R2_kappa,F,F2.kappa,Mean |Menger kappa| in the mid-posterior slab,(1 / |S_2|) * sum_{i in S_2} |kappa_i|,Lr,1/(unit length),positive,Tier F
+F_R3_thickness,F,F3.T,Central (midbody) slab v-extent thickness,max_{i in S_3} v_i - min_{i in S_3} v_i,Lr,dimensionless,positive,Tier F
+F_R3_kappa,F,F3.kappa,Mean |Menger kappa| in the central slab,(1 / |S_3|) * sum_{i in S_3} |kappa_i|,Lr,1/(unit length),positive,Tier F
+F_R4_thickness,F,F4.T,Mid-anterior slab v-extent thickness,max_{i in S_4} v_i - min_{i in S_4} v_i,Lr,dimensionless,positive,Tier F
+F_R4_kappa,F,F4.kappa,Mean |Menger kappa| in the mid-anterior slab,(1 / |S_4|) * sum_{i in S_4} |kappa_i|,Lr,1/(unit length),positive,Tier F
+F_R5_thickness,F,F5.T,Anterior (genu) slab v-extent thickness,max_{i in S_5} v_i - min_{i in S_5} v_i,Lr,dimensionless,positive,Tier F
+F_R5_kappa,F,F5.kappa,Mean |Menger kappa| in the anterior slab,(1 / |S_5|) * sum_{i in S_5} |kappa_i|,Lr,1/(unit length),positive,Tier F
+G_cci,G,G1,"Corpus Callosum Index: sum of three slab thicknesses (anterior, central, posterior) divided by per-subject antero-posterior extent",(T_5 + T_3 + T_1) / (max_i u_i - min_i u_i),derived (Tier F + per-subject u),dimensionless,positive,Tier G
+G_ratio_ap,G,G2,Anterior-to-posterior thickness ratio,T_5 / T_1,derived (Tier F),dimensionless,positive,Tier G

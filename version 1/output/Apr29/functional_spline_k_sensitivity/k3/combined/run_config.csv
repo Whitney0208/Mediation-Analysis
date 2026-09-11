@@ -1,0 +1,2 @@
+"output_label","basis_k","bootstrap_reps","random_seed","save_bootstrap_draws","gene_names","n_samples","n_grid","removed_n","orthonormality_max_abs_deviation"
+"k3",3,100,123,TRUE,"DDIT3,EGFR,KIT,MDM4,PDGFRA,PIK3CA,PTEN",64,1024,0,6.66133814775094e-16
