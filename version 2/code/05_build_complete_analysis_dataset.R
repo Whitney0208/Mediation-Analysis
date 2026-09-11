@@ -71,8 +71,9 @@ candidate_covariates <- c(
   "APOE4", "PTHAND", "ICV", "ADAS11", "ADAS13", "MMSE", "CDRSB", "FAQ",
   "FDG", "ABETA", "PTAU", "TAU", "W_pc2_male", "W_pc2_age_z",
   "W_pc2_handedness", "W_pc2_APOE4", paste0("W_pc2_PC", 1:2),
+  "W_pc2_education_years",
   "W_pc5_male", "W_pc5_age_z", "W_pc5_handedness", "W_pc5_APOE4",
-  paste0("W_pc5_PC", 1:5)
+  paste0("W_pc5_PC", 1:5), "W_pc5_education_years"
 )
 candidate_covariates <- candidate_covariates[candidate_covariates %in% names(analysis_frame)]
 
@@ -95,9 +96,9 @@ variable_catalog <- rbind(
   add_catalog("DX.bl", "eligibility", "ShapeMA info", "Baseline diagnosis; LMCI is the intended MCI cohort"),
   add_catalog("M / CC_q", "functional mediator", "ShapeMA SRVF MAT", "333 x 100 x 2; one multivariate shape mediator"),
   add_catalog("X_*", "exposure", "ShapeMA SNP MAT", "Four SNPs; additive dosage 0/1/2"),
-  add_catalog("W_pc2_*", "candidate adjustment set", "ShapeMA design MAT", "Current main covariate design"),
-  add_catalog("W_pc5_*", "candidate adjustment set", "ShapeMA design MAT", "Five-ancestry-PC sensitivity design"),
-  add_catalog("PTEDUCAT", "candidate adjustment variable", "ShapeMA info", "Education years; complete in matched data"),
+  add_catalog("W_pc2_*", "main adjustment set", "ShapeMA design MAT + ShapeMA info", "Includes PTEDUCAT as education_years"),
+  add_catalog("W_pc5_*", "sensitivity adjustment set", "ShapeMA design MAT + ShapeMA info", "Includes PTEDUCAT as education_years"),
+  add_catalog("PTEDUCAT", "adjustment variable", "ShapeMA info", "Education years; included in W_pc2 and W_pc5"),
   add_catalog("SITE", "candidate center effect", "ShapeMA info", "56 recruitment sites; consider stratification or center effect"),
   add_catalog("ICV", "candidate size adjustment", "ShapeMA info", "Intracranial volume"),
   add_catalog("ADAS13/MMSE/CDRSB/FAQ", "clinical candidate", "ShapeMA info", "Baseline cognition/function; causal role requires prespecification"),

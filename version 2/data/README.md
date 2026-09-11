@@ -23,7 +23,7 @@ The SPLS-Cox repository removes row 331 because the corresponding shape row is m
 |---|---|
 | `mediation_model_complete.rds` | Complete R list containing all analysis objects and metadata |
 | `mediation_model_complete.RData` | Same complete object in `.RData` format |
-| `mediation_model_complete_analysis_frame.csv` | 333-row subject-level table with 85 columns |
+| `mediation_model_complete_analysis_frame.csv` | 333-row subject-level table with 87 columns |
 | `mediation_model_complete_variable_catalog.csv` | Variable roles, sources and notes |
 | `mediation_model_matched.rds` | Original matched analysis object used by the first model scripts |
 
@@ -34,11 +34,11 @@ The functional mediator `M` cannot be represented conveniently as ordinary CSV c
 | Object | Dimension | Meaning |
 |---|---:|---|
 | `subject` | 333 x 49 | Original ShapeMA subject table plus `time`, `event` and matching row identifiers |
-| `analysis_frame` | 333 x 85 | Subject-level table combining all preserved fields, SNPs, both PC designs and raw SPLS columns |
+| `analysis_frame` | 333 x 87 | Subject-level table combining all preserved fields, SNPs, both PC designs and raw SPLS columns |
 | `X` | 333 x 4 | Four SNP exposures coded as additive dosage 0/1/2 |
 | `M` | 333 x 100 x 2 | Corpus callosum SRVF shape mediator |
-| `W_pc2` | 333 x 7 | Intercept, sex, age, handedness, APOE4, PC1 and PC2 |
-| `W_pc5` | 333 x 10 | Intercept, sex, age, handedness, APOE4 and PC1 through PC5 |
+| `W_pc2` | 333 x 8 | Intercept, sex, age, handedness, APOE4, PC1, PC2 and education years |
+| `W_pc5` | 333 x 11 | Intercept, sex, age, handedness, APOE4, PC1 through PC5 and education years |
 | `spls_clinical_raw` | 333 x 15 | Original SPLS survival and unnamed clinical columns, preserved by position |
 
 The last dimension of `M` has size 2 because the SRVF representation has two shape-coordinate functions. The two coordinates jointly form one multivariate functional mediator. The 100 grid points are positions along the normalized corpus callosum contour, not 100 independent mediators.
@@ -77,11 +77,11 @@ Dosage 0, 1 and 2 indicate the number of copies of the coded allele. The source 
 
 All original ShapeMA subject fields remain in `subject` and `analysis_frame`. The complete object also stores the candidate covariate table and its names in `candidate_covariates` and `candidate_covariate_names`.
 
-The main prepared design is `W_pc2`: `male`, `age_z`, `handedness`, `APOE4`, `PC1` and `PC2`. The alternative design `W_pc5` adds `PC3`, `PC4` and `PC5`. The intercept is included for the first-stage shape model and is not a substantive confounder.
+The main prepared design is `W_pc2`: `male`, `age_z`, `handedness`, `APOE4`, `PC1`, `PC2` and `education_years`. The alternative design `W_pc5` adds `PC3`, `PC4` and `PC5`. `education_years` is copied from the original `PTEDUCAT` field and is included in both designs. The intercept is included for the first-stage shape model and is not a substantive confounder.
 
-Additional preserved candidate fields include `PTEDUCAT` (education years), `ICV` (intracranial volume), `SITE`, `PTETHCAT`, `PTRACCAT`, `PTMARRY`, baseline cognitive measures such as `ADAS13`, `MMSE`, `CDRSB` and `FAQ`, and biomarkers such as `FDG`, `ABETA`, `PTAU` and `TAU`.
+Additional preserved candidate fields include `ICV` (intracranial volume), `SITE`, `PTETHCAT`, `PTRACCAT`, `PTMARRY`, baseline cognitive measures such as `ADAS13`, `MMSE`, `CDRSB` and `FAQ`, and biomarkers such as `FDG`, `ABETA`, `PTAU` and `TAU`.
 
-These variables are available for selection but are not automatically confounders. Education is complete in the matched sample. `PTRACCAT` has no variation in the matched data, `PTETHCAT` has very limited variation, and `SITE` has 56 observed site codes. Baseline cognition and biomarkers require a causal decision before adjustment because they may represent disease severity or downstream biology.
+The additional fields are available for selection but are not automatically confounders. Education is complete in the matched sample and is now part of both prepared adjustment sets. `PTRACCAT` has no variation in the matched data, `PTETHCAT` has very limited variation, and `SITE` has 56 observed site codes. Baseline cognition and biomarkers require a causal decision before adjustment because they may represent disease severity or downstream biology.
 
 ## Shape mediator
 
@@ -105,7 +105,7 @@ The following checks should be completed before final inference:
 
 - Confirm the baseline diagnosis and survival origin for `RID 739`.
 - Verify the coded allele orientation for all four SNPs.
-- Decide whether `PTEDUCAT` and `ICV` belong to the prespecified adjustment set.
+- Decide whether `ICV` belongs to the prespecified adjustment set.
 - Decide how a center effect for `SITE` should be handled.
 - Keep eligibility (`DX.bl`) separate from ordinary adjustment variables.
 

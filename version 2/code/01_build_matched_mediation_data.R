@@ -34,6 +34,13 @@ info$RID <- as.integer(info$RID)
 if (anyNA(info$RID) || anyDuplicated(info$RID)) {
   stop("The ShapeMA information table has missing or duplicated RID values.")
 }
+if (!"PTEDUCAT" %in% names(info)) {
+  stop("The ShapeMA information table has no PTEDUCAT column.")
+}
+education_years_all <- as.numeric(info$PTEDUCAT)
+if (anyNA(education_years_all) || any(!is.finite(education_years_all))) {
+  stop("PTEDUCAT must be complete and numeric before it is added to W.")
+}
 
 read_shape_mat <- suppressWarnings(R.matlab::readMat(
   file.path(shape_dir, "ADNI_CCseg_707subjects_SRVF.mat")
@@ -64,6 +71,7 @@ colnames(W_pc5_all) <- c(
   "intercept", "male", "age_z", "handedness", "APOE4",
   paste0("PC", 1:5)
 )
+W_pc5_all <- cbind(W_pc5_all, education_years = education_years_all)
 
 read_pc2_mat <- suppressWarnings(R.matlab::readMat(
   file.path(shape_dir, "x_design_correct_negative.mat")
@@ -73,6 +81,7 @@ if (is.null(W_pc2_all) || !identical(dim(W_pc2_all), c(707L, 7L))) {
   stop("Unexpected 2-PC design dimensions; expected 707 x 7.")
 }
 colnames(W_pc2_all) <- c("intercept", "male", "age_z", "handedness", "APOE4", "PC1", "PC2")
+W_pc2_all <- cbind(W_pc2_all, education_years = education_years_all)
 
 spls_env <- new.env(parent = emptyenv())
 load(file.path(spls_dir, "clinical.dat"), envir = spls_env)
@@ -146,7 +155,8 @@ model_data <- list(
     shape_file = "ADNI_CCseg_707subjects_SRVF.mat",
     survival_file = "clinical.dat",
     matching_key = "RID",
-    spls_removed_row = drop_row
+    spls_removed_row = drop_row,
+    education_variable = "PTEDUCAT (years)"
   )
 )
 
