@@ -95,6 +95,8 @@ dim(data$M)
 
 The two shape coordinates are modeled jointly. In the current functional Cox implementation they are reduced by weighted joint FPCA. The main model retains 18 shape FPCs, explaining 85.96% of the observed shape variation.
 
+For each SNP model, the first-stage coefficient table contains the smoothed and raw coefficient functions for the SNP and every column of the selected `W` matrix. The second-stage Cox coefficient table contains the SNP coefficient, each scalar covariate coefficient, and the coefficients of the retained shape FPC scores. The reconstructed functional Cox coefficient for the shape mediator is stored in the model results and the functional-parameter CSV files.
+
 The ancestry covariates `PC1` through `PC5` in `W_pc2` and `W_pc5` are genetic population-structure variables. They are different from the shape FPCs used to represent `CC_q` in the Cox layer.
 
 ## Data quality checks

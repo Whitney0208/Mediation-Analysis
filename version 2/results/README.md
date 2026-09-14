@@ -51,6 +51,14 @@ The fitted models show directionally different SNP-specific mediation patterns. 
 
 These results are model-based associations. They do not establish a causal mediation pathway. Before final inference, the baseline diagnosis and survival origin for `RID 739`, SNP coded-allele orientation, and the prespecified handling of center and intracranial-volume effects should be documented.
 
+## Complete coefficient outputs
+
+Each per-SNP shape-coefficient CSV has 900 rows: 9 first-stage predictors (the SNP, intercept, and 7 `W_pc2` columns) evaluated at 100 contour locations. `coordinate_1` and `coordinate_2` are the smoothed coefficient functions; the columns ending in `_raw` retain the unsmoothed values. These rows provide the first-stage coefficients for `X` and every confounder across the shape domain.
+
+Each per-SNP Cox-coefficient CSV has 26 rows: the SNP, the 7 scalar `W_pc2` covariates, and the 18 retained shape FPC scores. The `coefficient` column is on the log-hazard scale. `HR_per_unit` is the exponentiated coefficient; for an FPC term, one unit means one unit of that FPC score. The shape-mediated coefficient function is represented by the FPC coefficient vector together with the reconstructed `beta(s)` columns in each functional-parameter CSV.
+
 ## Result files
 
 The point estimates are in [`four_snp_effect_summary.csv`](four_snp_point_estimates/four_snp_effect_summary.csv), with scalar Cox parameters in [`four_snp_scalar_parameters.csv`](four_snp_point_estimates/four_snp_scalar_parameters.csv). The main bootstrap summary is [`bootstrap_summary_B1000_seed20260905.csv`](four_snp_bootstrap/bootstrap_summary_B1000_seed20260905.csv). Fixed-K results are in [`fixed_k_point_estimates.csv`](fixed_k_sensitivity/fixed_k_point_estimates.csv) and [`fixed_k_bootstrap_summary_B1000_seed20260905.csv`](fixed_k_sensitivity/fixed_k_bootstrap_summary_B1000_seed20260905.csv).
+
+Complete model coefficient tables are available in [`four_snp_shape_coefficients.csv`](four_snp_point_estimates/four_snp_shape_coefficients.csv) and [`four_snp_cox_coefficients.csv`](four_snp_point_estimates/four_snp_cox_coefficients.csv). Separate per-SNP files are also provided for `rs929708`, `rs11719939`, `rs4639533`, and `rs2515029`.

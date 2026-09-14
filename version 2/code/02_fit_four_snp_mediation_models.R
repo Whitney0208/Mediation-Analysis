@@ -256,6 +256,8 @@ fpca <- fit_joint_fpca(M, grid, variance_threshold = 0.85)
 model_results <- setNames(vector("list", length(snp_names)), snp_names)
 effect_rows <- vector("list", length(snp_names))
 scalar_rows <- vector("list", length(snp_names))
+shape_coefficient_rows <- vector("list", length(snp_names))
+cox_coefficient_rows <- vector("list", length(snp_names))
 
 for (index in seq_along(snp_names)) {
   snp <- snp_names[index]
@@ -302,6 +304,45 @@ for (index in seq_along(snp_names)) {
     HR = exp(unname(all_scalar))
   )
 
+  shape_coefficients <- shape_fit$coefficients_smoothed
+  shape_coefficients_raw <- shape_fit$coefficients_raw
+  shape_coefficient_table <- do.call(
+    rbind,
+    lapply(seq_len(nrow(shape_coefficients)), function(parameter_index) {
+      data.frame(
+        SNP_model = snp,
+        predictor = rownames(shape_coefficients)[parameter_index],
+        grid = grid,
+        coordinate_1 = shape_coefficients[parameter_index, , 1L],
+        coordinate_2 = shape_coefficients[parameter_index, , 2L],
+        coordinate_1_raw = shape_coefficients_raw[parameter_index, , 1L],
+        coordinate_2_raw = shape_coefficients_raw[parameter_index, , 2L],
+        row.names = NULL
+      )
+    })
+  )
+  shape_coefficient_rows[[index]] <- shape_coefficient_table
+  utils::write.csv(
+    shape_coefficient_table,
+    file.path(output_dir, paste0(snp, "_shape_coefficients.csv")),
+    row.names = FALSE
+  )
+
+  cox_coefficients <- stats::coef(cox_fit$fit)
+  cox_coefficient_table <- data.frame(
+    SNP_model = snp,
+    term = names(cox_coefficients),
+    coefficient = unname(cox_coefficients),
+    HR_per_unit = exp(unname(cox_coefficients)),
+    row.names = NULL
+  )
+  cox_coefficient_rows[[index]] <- cox_coefficient_table
+  utils::write.csv(
+    cox_coefficient_table,
+    file.path(output_dir, paste0(snp, "_cox_coefficients.csv")),
+    row.names = FALSE
+  )
+
   function_table <- data.frame(
     grid = grid,
     alpha_coordinate_1 = alpha[, 1L],
@@ -324,12 +365,16 @@ for (index in seq_along(snp_names)) {
     shape_layer = shape_fit,
     cox_layer = cox_fit,
     effects = effect_rows[[index]],
+    shape_coefficients = shape_coefficient_table,
+    cox_coefficients = cox_coefficient_table,
     functional_parameters = function_table
   )
 }
 
 effect_summary <- do.call(rbind, effect_rows)
 scalar_parameters <- do.call(rbind, scalar_rows)
+shape_coefficients_all <- do.call(rbind, shape_coefficient_rows)
+cox_coefficients_all <- do.call(rbind, cox_coefficient_rows)
 
 analysis_result <- list(
   effects = effect_summary,
@@ -360,6 +405,16 @@ utils::write.csv(
 utils::write.csv(
   scalar_parameters,
   file.path(output_dir, "four_snp_scalar_parameters.csv"),
+  row.names = FALSE
+)
+utils::write.csv(
+  shape_coefficients_all,
+  file.path(output_dir, "four_snp_shape_coefficients.csv"),
+  row.names = FALSE
+)
+utils::write.csv(
+  cox_coefficients_all,
+  file.path(output_dir, "four_snp_cox_coefficients.csv"),
   row.names = FALSE
 )
 saveRDS(
