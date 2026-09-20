@@ -1,5 +1,4 @@
 "replicate","K","SNP","cox_warning"
-96,18,"rs4639533","Loglik converged before variable  21 ; coefficient may be infinite. "
-607,15,"rs2515029","Loglik converged before variable  4 ; coefficient may be infinite. "
-722,10,"rs11719939","Loglik converged before variable  16 ; coefficient may be infinite. "
-782,10,"rs929708","Loglik converged before variable  6 ; coefficient may be infinite. "
+8,18,"rs2515029","Loglik converged before variable  6 ; coefficient may be infinite. "
+758,12,"rs4639533","Loglik converged before variable  6 ; coefficient may be infinite. "
+845,12,"rs929708","Loglik converged before variable  10 ; coefficient may be infinite. "

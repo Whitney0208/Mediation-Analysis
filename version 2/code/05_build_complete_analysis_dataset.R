@@ -94,7 +94,10 @@ variable_catalog <- rbind(
   add_catalog("time", "survival outcome", "SPLS clinical.dat", "Observed survival time"),
   add_catalog("event", "survival outcome", "SPLS clinical.dat", "1=AD conversion event; 0=censored"),
   add_catalog("DX.bl", "eligibility", "ShapeMA info", "Baseline diagnosis; LMCI is the intended MCI cohort"),
-  add_catalog("M / CC_q", "functional mediator", "ShapeMA SRVF MAT", "333 x 100 x 2; one multivariate shape mediator"),
+  add_catalog(
+    "M / CC_q", "functional mediator", "ShapeMA SRVF MAT",
+    paste(dim(matched$M), collapse = " x ") |> paste0("; one multivariate shape mediator")
+  ),
   add_catalog("X_*", "exposure", "ShapeMA SNP MAT", "Four SNPs; additive dosage 0/1/2"),
   add_catalog("W_pc2_*", "main adjustment set", "ShapeMA design MAT + ShapeMA info", "Includes PTEDUCAT as education_years"),
   add_catalog("W_pc5_*", "sensitivity adjustment set", "ShapeMA design MAT + ShapeMA info", "Includes PTEDUCAT as education_years"),

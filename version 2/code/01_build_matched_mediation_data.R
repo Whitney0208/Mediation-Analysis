@@ -121,8 +121,20 @@ current_row <- match(survival_data$RID, info$RID)
 matched <- !is.na(current_row)
 if (sum(matched) == 0L) stop("No RID values could be matched.")
 
-survival_matched <- survival_data[matched, , drop = FALSE]
-current_row_matched <- current_row[matched]
+survival_matched_all <- survival_data[matched, , drop = FALSE]
+current_row_matched_all <- current_row[matched]
+baseline_diagnosis <- as.character(info$DX.bl[current_row_matched_all])
+eligible_lmci <- !is.na(baseline_diagnosis) & baseline_diagnosis == "LMCI"
+eligibility_exclusions <- data.frame(
+  RID = survival_matched_all$RID[!eligible_lmci],
+  DX.bl = baseline_diagnosis[!eligible_lmci],
+  reason = "Baseline diagnosis is not LMCI",
+  stringsAsFactors = FALSE
+)
+if (sum(eligible_lmci) == 0L) stop("No baseline LMCI subjects remain after eligibility filtering.")
+
+survival_matched <- survival_matched_all[eligible_lmci, , drop = FALSE]
+current_row_matched <- current_row_matched_all[eligible_lmci]
 subject <- info[current_row_matched, , drop = FALSE]
 subject$source_shape_row <- current_row_matched
 subject$source_spls_row <- survival_matched$spls_row
@@ -156,7 +168,9 @@ model_data <- list(
     survival_file = "clinical.dat",
     matching_key = "RID",
     spls_removed_row = drop_row,
-    education_variable = "PTEDUCAT (years)"
+    education_variable = "PTEDUCAT (years)",
+    eligibility_rule = "DX.bl == LMCI",
+    eligibility_exclusions = eligibility_exclusions
   )
 )
 
@@ -170,9 +184,15 @@ audit <- merge(
   by = "RID", all.x = TRUE, sort = FALSE
 )
 audit$matched <- !is.na(audit$shapeMA_row)
+audit$baseline_diagnosis <- info$DX.bl[match(audit$RID, info$RID)]
+audit$eligible_lmci <- audit$matched & !is.na(audit$baseline_diagnosis) &
+  audit$baseline_diagnosis == "LMCI"
+audit$included_analysis <- audit$matched & audit$eligible_lmci
 write.csv(audit, file.path(out_dir, "mediation_model_RID_match_audit.csv"), row.names = FALSE)
 
 cat("Matched subjects:", nrow(subject), "\n")
+cat("Excluded after RID matching:", nrow(eligibility_exclusions), "\n")
+if (nrow(eligibility_exclusions) > 0L) print(eligibility_exclusions, row.names = FALSE)
 cat("Events:", sum(subject$event == 1L), " Censored:", sum(subject$event == 0L), "\n")
 cat("Mediator dimensions (subject x grid x coordinate):", paste(dim(M), collapse = " x "), "\n")
 cat("Outputs:\n")
