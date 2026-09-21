@@ -56,6 +56,21 @@ There were no failed wild replicates. Three Cox fits produced convergence warnin
 
 The wild standard errors were smaller than the ordinary bootstrap standard errors for all 12 direct, indirect, and total effects. The reduction was modest for the indirect effects: approximately 3% for `rs929708`, 4% for `rs11719939`, 9% for `rs4639533`, and 6% for `rs2515029`. Every wild interval still included HR = 1, so the inferential conclusion is unchanged.
 
+## BCa bootstrap at fixed K = 18
+
+A third analysis used 5,000 subject-level pairs-bootstrap replicates and all 332 leave-one-subject-out jackknife fits. The FPCA dimension was fixed at `K = 18` before resampling. The shape layer, FPCA basis, and Cox layer were re-estimated in every bootstrap and jackknife fit. The BCa intervals adjust the percentile positions using both the bootstrap bias-correction term and the jackknife acceleration term.
+
+| SNP | Direct HR (95% BCa CI) | Indirect HR (95% BCa CI) | Total HR (95% BCa CI) | Warning-free replicates |
+|---|---:|---:|---:|---:|
+| `rs929708` | 0.881 (0.628-1.296) | 1.070 (0.907-1.243) | 0.943 (0.660-1.383) | 4,998 |
+| `rs11719939` | 1.050 (0.748-1.540) | 1.065 (0.885-1.246) | 1.118 (0.791-1.649) | 4,997 |
+| `rs4639533` | 0.846 (0.597-1.212) | 1.131 (0.966-1.368) | 0.957 (0.665-1.361) | 4,998 |
+| `rs2515029` | 0.981 (0.708-1.285) | 0.953 (0.834-1.102) | 0.934 (0.684-1.245) | 4,997 |
+
+All 5,000 bootstrap replicates and all 332 jackknife fits completed. Ten individual Cox fits generated convergence warnings and were omitted only from the corresponding SNP summaries. No jackknife fit produced a warning. The jackknife acceleration estimates were small in magnitude, ranging from -0.007 to 0.014 for the 12 principal effects, while the bias-correction terms produced most of the difference from ordinary percentile intervals.
+
+Every BCa interval includes HR = 1. `rs4639533` remains the closest to a positive shape-mediated association, with indirect HR 1.131 and 95% BCa CI 0.966-1.368. The BCa analysis therefore confirms the same inferential conclusion as the ordinary and wild bootstrap analyses.
+
 ## Fixed-K sensitivity
 
 The analysis was repeated with `K = 8`, 10, 12, 15, and 18. The direction of the indirect point estimate was stable across all K values: positive for `rs929708`, `rs11719939`, and `rs4639533`, and negative for `rs2515029`. The corresponding indirect point HR ranges were 1.070-1.085, 1.065-1.077, 1.111-1.131, and 0.942-0.953, respectively.
