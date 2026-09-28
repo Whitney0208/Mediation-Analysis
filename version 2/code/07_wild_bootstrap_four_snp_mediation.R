@@ -31,7 +31,7 @@ output_dir <- file.path(project_dir, "results", "four_snp_wild_bootstrap")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 args <- commandArgs(trailingOnly = TRUE)
-n_bootstrap <- if (length(args) >= 1L) as.integer(args[1L]) else 1000L
+n_bootstrap <- if (length(args) >= 1L) as.integer(args[1L]) else 10000L
 seed <- if (length(args) >= 2L) as.integer(args[2L]) else 20260920L
 if (is.na(n_bootstrap) || n_bootstrap < 1L) {
   stop("The number of wild bootstrap replicates must be a positive integer.")
