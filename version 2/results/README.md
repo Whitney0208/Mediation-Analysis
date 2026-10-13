@@ -81,9 +81,26 @@ The analysis was repeated with `K = 8`, 10, 12, 15, and 18. The direction of the
 
 All fixed-K bootstrap 95% CIs for the indirect HR included 1. Increasing K raised the retained shape variance from 66.62% at K = 8 to 85.98% at K = 18, and the C-index increased from approximately 0.644-0.647 to approximately 0.664-0.667. The qualitative direction of the mediation estimates was stable, while uncertainty remained substantial.
 
+## Penalized functional Cox model
+
+A standalone English summary is available in [`penalized_functional_cox/README.md`](penalized_functional_cox/README.md).
+
+The second layer was refitted without FPCA truncation, following the penalized scalar-on-function approach of S-GMAS. Each shape coefficient `beta_j(s)` uses 20 cubic P-spline basis functions with a second-order difference penalty, and the smoothing parameters are selected by REML. The first layer is unchanged. The shape term uses about 5.7 effective degrees of freedom instead of 18 FPC coefficients, and the estimates were insensitive to the number of basis functions.
+
+| SNP | Indirect HR | Wild 95% CI (basic / percentile / BCa) | Pairs 95% CI (percentile / basic / BCa) |
+|---|---:|---:|---:|
+| `rs929708` | 1.095 | 0.986-1.198 / 1.001-1.216 / 1.002-1.219 | 0.994-1.243 / 0.965-1.206 / 0.985-1.224 |
+| `rs11719939` | 1.091 | 0.982-1.193 / 0.997-1.212 / 0.999-1.215 | 0.992-1.244 / 0.956-1.199 / 0.975-1.219 |
+| `rs4639533` | 1.135 | 0.990-1.271 / 1.014-1.302 / 1.018-1.307 | 1.005-1.339 / 0.962-1.282 / 0.997-1.322 |
+| `rs2515029` | 0.950 | 0.875-1.050 / 0.860-1.032 / 0.863-1.034 | 0.854-1.042 / 0.866-1.058 / 0.857-1.045 |
+
+Both bootstraps used 10,000 replicates. The wild bootstrap held the smoothing parameters fixed, whereas the pairs bootstrap reselected them by REML in every replicate. Relative to the FLCRM, the indirect-effect standard error fell by 16% to 29% under the pairs bootstrap. The indirect effects of `rs4639533` and `rs929708` excluded HR = 1 under the wild percentile and BCa intervals, but no indirect effect excluded 1 under the pairs BCa interval. Every direct- and total-effect interval included 1.
+
 ## Current conclusion
 
 The fitted models show directionally different SNP-specific mediation patterns. `rs929708` and `rs4639533` have opposing direct and shape-mediated pathways, `rs11719939` has concordant positive pathways, and `rs2515029` has concordant negative pathways. The directions are reasonably stable across the examined FPCA dimensions, but the bootstrap intervals remain wide and include the null value of HR = 1 for every reported effect.
+
+The penalized functional Cox model improved the precision of the indirect effect. Under that model, `rs4639533` shows a borderline shape-mediated association whose significance depends on the resampling scheme and interval type, so the evidence is suggestive rather than robust.
 
 These results are model-based associations. They do not establish a causal mediation pathway. Before final inference, the SNP coded-allele orientation and the prespecified handling of center and intracranial-volume effects should be documented.
 
@@ -1136,3 +1153,5 @@ Full precision: [shape coefficients](four_snp_point_estimates/rs2515029_shape_co
 The point estimates are in [`four_snp_effect_summary.csv`](four_snp_point_estimates/four_snp_effect_summary.csv), with scalar Cox parameters in [`four_snp_scalar_parameters.csv`](four_snp_point_estimates/four_snp_scalar_parameters.csv). The main bootstrap summary is [`bootstrap_summary_B1000_seed20260905.csv`](four_snp_bootstrap/bootstrap_summary_B1000_seed20260905.csv). Fixed-K results are in [`fixed_k_point_estimates.csv`](fixed_k_sensitivity/fixed_k_point_estimates.csv) and [`fixed_k_bootstrap_summary_B1000_seed20260905.csv`](fixed_k_sensitivity/fixed_k_bootstrap_summary_B1000_seed20260905.csv).
 
 Complete model coefficient tables are available in [`four_snp_shape_coefficients.csv`](four_snp_point_estimates/four_snp_shape_coefficients.csv) and [`four_snp_cox_coefficients.csv`](four_snp_point_estimates/four_snp_cox_coefficients.csv). Separate per-SNP files are also provided for `rs929708`, `rs11719939`, `rs4639533`, and `rs2515029`.
+
+The penalized functional Cox results are in [`penalized_functional_cox/`](penalized_functional_cox/), [`penalized_functional_cox_wild_bootstrap/`](penalized_functional_cox_wild_bootstrap/), [`penalized_functional_cox_bootstrap/`](penalized_functional_cox_bootstrap/), and [`penalized_functional_cox_bca/`](penalized_functional_cox_bca/).
