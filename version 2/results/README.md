@@ -14,9 +14,39 @@ The analysis sample contains 332 subjects with baseline diagnosis LMCI, includin
 
 The main adjustment matrix is `W_pc2`. It contains an intercept, sex, standardized age, handedness, APOE4, genetic ancestry PCs 1 and 2, and education years (`PTEDUCAT`). The alternative `W_pc5` design adds ancestry PCs 3 through 5. The results summarized here use `W_pc2`.
 
-The first layer estimates SNP-specific shape coefficient functions. The second layer uses a Cox model with joint weighted FPCA of the two shape coordinates. The main analysis retains `K = 18` shape FPCs, explaining 85.98% of the observed shape variation. The indirect effect is the functional product of the SNP-to-shape and shape-to-hazard coefficient functions. The reported total HR is the product of the direct and indirect HRs under this product-method decomposition.
+The first layer estimates SNP-specific shape coefficient functions. The second layer is a Cox model with a functional shape term. The main analysis represents the shape coefficient functions with penalized splines (penalized functional Cox model). The original analysis, retained as a comparison model, used the first `K = 18` joint FPCs of the two shape coordinates (FLCRM). In both, the indirect effect is the functional product of the SNP-to-shape and shape-to-hazard coefficient functions, and the reported total HR is the product of the direct and indirect HRs under this product-method decomposition.
 
-## Point estimates at K = 18
+## Main analysis: penalized functional Cox model
+
+A standalone English summary is available in [`penalized_functional_cox/README.md`](penalized_functional_cox/README.md).
+
+The main analysis fits the second layer without FPCA truncation, following the penalized scalar-on-function approach of S-GMAS. Each shape coefficient `beta_j(s)` uses 20 cubic P-spline basis functions with a second-order difference penalty, and the smoothing parameters are selected by REML. The first layer is unchanged. The shape term uses about 5.7 effective degrees of freedom instead of 18 FPC coefficients, and the estimates were insensitive to the number of basis functions.
+
+The primary intervals are pairs-bootstrap BCa intervals (10,000 subject-level resamples, smoothing parameters reselected by REML in every replicate). Hazard ratios are per one additional coded allele.
+
+| SNP | Direct HR (95% BCa CI) | Indirect HR (95% BCa CI) | Total HR (95% BCa CI) |
+|---|---:|---:|---:|
+| `rs929708` | 0.840 (0.621-1.161) | 1.095 (0.985-1.224) | 0.920 (0.672-1.289) |
+| `rs11719939` | 0.997 (0.742-1.379) | 1.091 (0.975-1.219) | 1.088 (0.800-1.520) |
+| `rs4639533` | 0.864 (0.645-1.181) | 1.135 (0.997-1.322) | 0.981 (0.710-1.366) |
+| `rs2515029` | 1.008 (0.774-1.306) | 0.950 (0.857-1.045) | 0.958 (0.732-1.259) |
+
+Indirect-effect intervals under all bootstrap and interval types:
+
+| SNP | Indirect HR | Wild 95% CI (basic / percentile / BCa) | Pairs 95% CI (percentile / basic / BCa) |
+|---|---:|---:|---:|
+| `rs929708` | 1.095 | 0.986-1.198 / 1.001-1.216 / 1.002-1.219 | 0.994-1.243 / 0.965-1.206 / 0.985-1.224 |
+| `rs11719939` | 1.091 | 0.982-1.193 / 0.997-1.212 / 0.999-1.215 | 0.992-1.244 / 0.956-1.199 / 0.975-1.219 |
+| `rs4639533` | 1.135 | 0.990-1.271 / 1.014-1.302 / 1.018-1.307 | 1.005-1.339 / 0.962-1.282 / 0.997-1.322 |
+| `rs2515029` | 0.950 | 0.875-1.050 / 0.860-1.032 / 0.863-1.034 | 0.854-1.042 / 0.866-1.058 / 0.857-1.045 |
+
+Both bootstraps used 10,000 replicates. The wild bootstrap held the smoothing parameters fixed, whereas the pairs bootstrap reselected them by REML in every replicate. Relative to the FLCRM, the indirect-effect standard error fell by 16% to 29% under the pairs bootstrap. The indirect effects of `rs4639533` and `rs929708` excluded HR = 1 under the wild percentile and BCa intervals, but no indirect effect excluded 1 under the pairs BCa interval. Every direct- and total-effect interval included 1.
+
+## Original FLCRM analysis (comparison model)
+
+The sections below summarize the original functional linear Cox regression model, whose second layer uses the first `K = 18` joint FPCs of the two shape coordinates. It is retained as a comparison model.
+
+### Point estimates at K = 18
 
 The table reports HRs per one additional coded allele. Bootstrap intervals are percentile 95% CIs based on 1,000 subject-level resamples. Each SNP had 999 warning-free replicates because one replicate generated a Cox warning. No fatal bootstrap errors occurred.
 
@@ -27,7 +57,7 @@ The table reports HRs per one additional coded allele. Bootstrap intervals are p
 | `rs4639533` | 0.846 (0.596-1.186) | 1.131 (0.962-1.363) | 0.957 (0.665-1.351) | 0.664 |
 | `rs2515029` | 0.981 (0.729-1.334) | 0.953 (0.821-1.093) | 0.934 (0.693-1.279) | 0.665 |
 
-## Interpretation of the point estimates
+### Interpretation of the point estimates
 
 `rs929708` has a direct HR below 1 and an indirect HR above 1. The two pathways point in opposite directions, so the total HR is close to 1. `rs4639533` shows the same pattern, with the largest positive point estimate for the shape-mediated pathway and a total HR close to 1.
 
@@ -35,11 +65,11 @@ The table reports HRs per one additional coded allele. Bootstrap intervals are p
 
 These are directional descriptions of point estimates. Every 95% bootstrap CI for the direct, indirect, and total HR includes 1. The current analysis therefore does not provide evidence for a statistically distinguishable direct, shape-mediated, or total association at the 95% CI level.
 
-## Bootstrap behavior
+### Bootstrap behavior
 
 The bootstrap distributions were generated by resampling subjects, refitting the shape layer, recomputing the joint FPCA basis, and refitting the Cox layer in each replicate. The bootstrap means were close to the corresponding point estimates. For the main indirect effect, the bootstrap 95% CIs were 0.931-1.250 for `rs929708`, 0.920-1.273 for `rs11719939`, 0.962-1.363 for `rs4639533`, and 0.821-1.093 for `rs2515029`.
 
-## Wild multiplier bootstrap
+### Wild multiplier bootstrap
 
 A standalone English summary is available in [`four_snp_wild_bootstrap/README.md`](four_snp_wild_bootstrap/README.md).
 
@@ -58,7 +88,7 @@ There were no failed wild replicates. Twenty Cox fits produced convergence warni
 
 The wild standard errors were smaller than the existing 1,000-replicate ordinary bootstrap standard errors for all 12 direct, indirect, and total effects. The reduction was modest for the indirect effects: approximately 1% for `rs929708`, 3% for `rs11719939`, 7% for `rs4639533`, and 8% for `rs2515029`. Smaller standard errors do not establish better coverage. Every wild interval still included HR = 1, so the inferential conclusion is unchanged.
 
-## BCa bootstrap at fixed K = 18
+### BCa bootstrap at fixed K = 18
 
 A standalone English summary is available in [`four_snp_bca_bootstrap/README.md`](four_snp_bca_bootstrap/README.md).
 
@@ -75,36 +105,36 @@ All 5,000 bootstrap replicates and all 332 jackknife fits completed. Ten individ
 
 Every BCa interval includes HR = 1. `rs4639533` remains the closest to a positive shape-mediated association, with indirect HR 1.131 and 95% BCa CI 0.966-1.368. The BCa analysis therefore confirms the same inferential conclusion as the ordinary and wild bootstrap analyses.
 
-## Fixed-K sensitivity
+### Fixed-K sensitivity
 
 The analysis was repeated with `K = 8`, 10, 12, 15, and 18. The direction of the indirect point estimate was stable across all K values: positive for `rs929708`, `rs11719939`, and `rs4639533`, and negative for `rs2515029`. The corresponding indirect point HR ranges were 1.070-1.085, 1.065-1.077, 1.111-1.131, and 0.942-0.953, respectively.
 
 All fixed-K bootstrap 95% CIs for the indirect HR included 1. Increasing K raised the retained shape variance from 66.62% at K = 8 to 85.98% at K = 18, and the C-index increased from approximately 0.644-0.647 to approximately 0.664-0.667. The qualitative direction of the mediation estimates was stable, while uncertainty remained substantial.
 
-## Penalized functional Cox model
+## Supplementary analysis: CC shape and volume
 
-A standalone English summary is available in [`penalized_functional_cox/README.md`](penalized_functional_cox/README.md).
+A standalone English summary is available in [`shape_volume_mediation/README.md`](shape_volume_mediation/README.md).
 
-The second layer was refitted without FPCA truncation, following the penalized scalar-on-function approach of S-GMAS. Each shape coefficient `beta_j(s)` uses 20 cubic P-spline basis functions with a second-order difference penalty, and the smoothing parameters are selected by REML. The first layer is unchanged. The shape term uses about 5.7 effective degrees of freedom instead of 18 FPC coefficients, and the estimates were insensitive to the number of basis functions.
+Total CC volume (the sum of the five FreeSurfer subregions divided by ICV) was added to the main model as a second, scalar mediator, so that CC shape and CC size enter the same model. The analysis used the same pairs bootstrap and BCa construction as the main analysis.
 
-| SNP | Indirect HR | Wild 95% CI (basic / percentile / BCa) | Pairs 95% CI (percentile / basic / BCa) |
+| SNP | Indirect through shape (95% BCa CI) | Indirect through volume (95% BCa CI) | Total indirect (95% BCa CI) |
 |---|---:|---:|---:|
-| `rs929708` | 1.095 | 0.986-1.198 / 1.001-1.216 / 1.002-1.219 | 0.994-1.243 / 0.965-1.206 / 0.985-1.224 |
-| `rs11719939` | 1.091 | 0.982-1.193 / 0.997-1.212 / 0.999-1.215 | 0.992-1.244 / 0.956-1.199 / 0.975-1.219 |
-| `rs4639533` | 1.135 | 0.990-1.271 / 1.014-1.302 / 1.018-1.307 | 1.005-1.339 / 0.962-1.282 / 0.997-1.322 |
-| `rs2515029` | 0.950 | 0.875-1.050 / 0.860-1.032 / 0.863-1.034 | 0.854-1.042 / 0.866-1.058 / 0.857-1.045 |
+| `rs929708` | 1.092 (0.981-1.223) | 0.999 (0.967-1.013) | 1.091 (0.976-1.221) |
+| `rs11719939` | 1.088 (0.972-1.213) | 0.999 (0.968-1.016) | 1.087 (0.967-1.215) |
+| `rs4639533` | 1.131 (0.993-1.317) | 1.003 (0.989-1.051) | 1.133 (0.994-1.322) |
+| `rs2515029` | 0.952 (0.856-1.048) | 0.996 (0.951-1.015) | 0.948 (0.853-1.048) |
 
-Both bootstraps used 10,000 replicates. The wild bootstrap held the smoothing parameters fixed, whereas the pairs bootstrap reselected them by REML in every replicate. Relative to the FLCRM, the indirect-effect standard error fell by 16% to 29% under the pairs bootstrap. The indirect effects of `rs4639533` and `rs929708` excluded HR = 1 under the wild percentile and BCa intervals, but no indirect effect excluded 1 under the pairs BCa interval. Every direct- and total-effect interval included 1.
+CC volume did not mediate any SNP effect, and adding it left the shape-mediated effects essentially unchanged. The mediation signal therefore reflects CC shape rather than CC size.
 
 ## Current conclusion
 
-The fitted models show directionally different SNP-specific mediation patterns. `rs929708` and `rs4639533` have opposing direct and shape-mediated pathways, `rs11719939` has concordant positive pathways, and `rs2515029` has concordant negative pathways. The directions are reasonably stable across the examined FPCA dimensions, but the bootstrap intervals remain wide and include the null value of HR = 1 for every reported effect.
+The fitted models show directionally different SNP-specific mediation patterns. `rs929708` and `rs4639533` have opposing direct and shape-mediated pathways, `rs11719939` has concordant positive pathways, and `rs2515029` has concordant negative pathways. These directions are stable across the penalized functional Cox model, the FLCRM, and the examined FPCA dimensions.
 
-The penalized functional Cox model improved the precision of the indirect effect. Under that model, `rs4639533` shows a borderline shape-mediated association whose significance depends on the resampling scheme and interval type, so the evidence is suggestive rather than robust.
+In the main penalized functional Cox analysis, every pairs-bootstrap BCa interval includes HR = 1. `rs4639533` shows a borderline shape-mediated association (indirect HR 1.135, 95% BCa CI 0.997-1.322) whose significance depends on the resampling scheme and interval type, so the evidence is suggestive rather than robust. CC volume does not mediate any SNP effect, and the shape-mediated estimates are unchanged after accounting for it.
 
 These results are model-based associations. They do not establish a causal mediation pathway. Before final inference, the SNP coded-allele orientation and the prespecified handling of center and intracranial-volume effects should be documented.
 
-## Full coefficients by SNP model
+## Full FLCRM coefficients by SNP model
 
 The two fitted layers are `M_j(s) = alpha_j(s) X + lambda_j(s)^T W + error` and `h(t) = h0(t) exp[tau X + kappa^T W + sum_j integral M_j(s) beta_j(s) ds]`, for shape coordinates `j = 1, 2`. The intercept appears only in the first layer. The Cox layer uses 18 joint shape FPC scores to fit the functional coefficient `beta_j(s)`.
 
@@ -1154,4 +1184,4 @@ The point estimates are in [`four_snp_effect_summary.csv`](four_snp_point_estima
 
 Complete model coefficient tables are available in [`four_snp_shape_coefficients.csv`](four_snp_point_estimates/four_snp_shape_coefficients.csv) and [`four_snp_cox_coefficients.csv`](four_snp_point_estimates/four_snp_cox_coefficients.csv). Separate per-SNP files are also provided for `rs929708`, `rs11719939`, `rs4639533`, and `rs2515029`.
 
-The penalized functional Cox results are in [`penalized_functional_cox/`](penalized_functional_cox/), [`penalized_functional_cox_wild_bootstrap/`](penalized_functional_cox_wild_bootstrap/), [`penalized_functional_cox_bootstrap/`](penalized_functional_cox_bootstrap/), and [`penalized_functional_cox_bca/`](penalized_functional_cox_bca/).
+The penalized functional Cox results are in [`penalized_functional_cox/`](penalized_functional_cox/), [`penalized_functional_cox_wild_bootstrap/`](penalized_functional_cox_wild_bootstrap/), [`penalized_functional_cox_bootstrap/`](penalized_functional_cox_bootstrap/), and [`penalized_functional_cox_bca/`](penalized_functional_cox_bca/). The shape and volume results are in [`shape_volume_mediation/`](shape_volume_mediation/) and [`shape_volume_mediation_bootstrap/`](shape_volume_mediation_bootstrap/).

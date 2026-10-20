@@ -38,14 +38,16 @@ basis_sizes <- c(10L, 20L, 30L)
 # Cox outcome:
 #   h(t) = h0(t) exp[tau X + kappa' W + sum_j integral M_j(s) beta_j(s) ds].
 # Each beta_j(s) is a penalized spline; the integral uses trapezoid weights and
-# the smoothing parameters are chosen by REML.
+# the smoothing parameters are chosen by REML. Optional scalar mediators (a
+# named n x q matrix) enter the hazard as unpenalized linear terms.
 fit_penalized_functional_cox <- function(
   x,
   W_matrix,
   subject_data,
   shape_array,
   shape_grid,
-  basis_size = main_basis_size
+  basis_size = main_basis_size,
+  scalar_mediators = NULL
 ) {
   n_subjects <- dim(shape_array)[1L]
   p_grid <- length(shape_grid)
@@ -55,7 +57,7 @@ fit_penalized_functional_cox <- function(
   cox_data <- list(
     time = as.numeric(subject_data$time),
     event = as.integer(subject_data$event),
-    scalar = cbind(SNP = as.numeric(x), W_cox),
+    scalar = cbind(SNP = as.numeric(x), W_cox, scalar_mediators),
     s1 = grid_matrix,
     s2 = grid_matrix,
     m1 = sweep(shape_array[, , 1L], 2L, weights_grid, FUN = "*"),
@@ -89,9 +91,19 @@ fit_penalized_functional_cox <- function(
     )
   })
 
+  mediator_coefficients <- if (is.null(scalar_mediators)) {
+    NULL
+  } else {
+    stats::setNames(
+      coefficients[paste0("scalar", colnames(scalar_mediators))],
+      colnames(scalar_mediators)
+    )
+  }
+
   list(
     fit = fit,
     tau = unname(coefficients["scalarSNP"]),
+    mediator_coefficients = mediator_coefficients,
     beta = cbind(
       coordinate_1 = smooth_parts[[1L]]$beta,
       coordinate_2 = smooth_parts[[2L]]$beta
