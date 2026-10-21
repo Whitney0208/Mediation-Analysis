@@ -125,6 +125,25 @@ The main version divides total CC volume by ICV. In this sensitivity analysis, t
 
 Values are HRs with 95% BCa intervals. The volume pathway remained null (indirect HRs 0.995 to 1.002), and direct and total effects were essentially unchanged. The shape indirect effect of `rs4639533` had a BCa lower bound of 1.0004 in this version, compared with 0.993 in the ratio version, so the borderline status of this SNP does not depend on how ICV is handled.
 
+## Sensitivity: Five Subregion Volumes with Shape
+
+This sensitivity analysis replaces the single total-volume mediator with the five subregion volumes (anterior, mid-anterior, central, mid-posterior, posterior), each divided by ICV and standardized, alongside the shape mediator:
+
+$$V_r = a_r X + c_r^\top W + e_r, \qquad h(t) = h_0(t)\exp\Big[\tau X + \kappa^\top W + \sum_j \int M_j(s)\beta_j(s)\,ds + \sum_{r=1}^{5} b_r V_r\Big].$$
+
+The indirect effect through volume is $\sum_r a_r b_r$, and each $a_r b_r$ is reported separately. The bootstrap design matches the main analysis (10,000 pairs replicates, seed `20260905`, REML reselection, BCa from 332 jackknife fits). No replicate failed; one warning-flagged fit was excluded.
+
+| SNP | Through shape | Through volume (5 subregions) | Total indirect | Total indirect, total-volume model |
+|---|---:|---:|---:|---:|
+| `rs929708` | 1.075 (0.952-1.211) | 1.013 (0.933-1.106) | 1.089 (0.944-1.243) | 1.091 (0.976-1.221) |
+| `rs11719939` | 1.070 (0.941-1.196) | 0.979 (0.903-1.060) | 1.048 (0.897-1.194) | 1.087 (0.967-1.215) |
+| `rs4639533` | 1.103 (0.959-1.292) | 1.022 (0.943-1.139) | 1.128 (0.967-1.334) | 1.133 (0.994-1.322) |
+| `rs2515029` | 0.962 (0.865-1.080) | 0.995 (0.910-1.074) | 0.957 (0.852-1.085) | 0.948 (0.853-1.048) |
+
+Values are HRs with 95% BCa intervals. All 20 subregion-specific indirect effects $a_r b_r$ had BCa intervals including 1 (point HRs 0.977 to 1.028), and every direct- and total-effect interval included 1.
+
+With five correlated subregion volumes (pairwise r = 0.63 to 0.81) in the model, part of the information previously attributed to shape is shared with the subregion volumes, which describe local CC size along the same contour. The shape-mediated estimates therefore decrease slightly (for `rs4639533`, 1.131 to 1.103) and all intervals widen. The total indirect point estimates are close to those of the total-volume model, and the joint volumetric indirect effect remains near 1. The conclusions are unchanged: no CC volume pathway was detected, and no indirect effect excluded 1 under the BCa interval.
+
 ## Volume-Only Mediation (Comparison with S-GMAS)
 
 To compare directly with the volumetric analysis of S-GMAS, a separate model used CC volumes as the only mediators, without the shape term. Each of the five subregion volumes was divided by ICV and standardized. The second layer is an ordinary Cox model, and the bootstrap design matches the main analysis (10,000 pairs replicates, seed `20260905`, BCa from 332 jackknife fits; 8 of 40,000 replicate-level fits produced Cox warnings and were excluded).
@@ -155,18 +174,21 @@ Values are indirect HRs with 95% BCa intervals. No joint volumetric indirect eff
 | [`wild_bootstrap_estimates_B10000_seed20260920_k20.csv`](../shape_volume_wild_bootstrap/wild_bootstrap_estimates_B10000_seed20260920_k20.csv) | Replicate-level wild bootstrap estimates |
 | [`fixed_smoothing_jackknife_n332_k20.csv`](../shape_volume_wild_bootstrap/fixed_smoothing_jackknife_n332_k20.csv) | Leave-one-subject-out estimates for the wild BCa acceleration |
 | [`bootstrap_summary_B10000_seed20260905_k20.csv`](../shape_volume_icv_covariate_bootstrap/bootstrap_summary_B10000_seed20260905_k20.csv) | ICV-covariate sensitivity: point estimates and intervals |
+| [`bootstrap_summary_B10000_seed20260905_k20.csv`](../shape_subregion_volumes_bootstrap/bootstrap_summary_B10000_seed20260905_k20.csv) | Five-subregion sensitivity: shape, combined volume, subregion-specific, and total indirect effects |
+| [`bootstrap_estimates_B10000_seed20260905_k20.csv`](../shape_subregion_volumes_bootstrap/bootstrap_estimates_B10000_seed20260905_k20.csv) | Five-subregion sensitivity: replicate-level estimates |
 | [`bootstrap_summary_B10000_seed20260905.csv`](../volume_only_mediation/bootstrap_summary_B10000_seed20260905.csv) | Volume-only mediation: joint and single-region indirect effects with BCa and percentile intervals |
 | [`volume_only_point_estimates.csv`](../volume_only_mediation/volume_only_point_estimates.csv) | Volume-only point estimates |
 
 ## Reproduction
 
-Run from the `version 2` directory. The last argument of scripts 23, 26, and 27 is the number of CPU cores.
+Run from the `version 2` directory. The last argument of scripts 23, 26, 27, and 29 is the number of CPU cores.
 
 ```bash
 Rscript code/22_fit_shape_volume_mediation.R
 Rscript code/23_bootstrap_shape_volume_mediation.R 10000 20260905 6
 Rscript code/28_wild_bootstrap_shape_volume.R 10000 20260920
 Rscript code/27_shape_volume_icv_covariate.R 10000 20260905 6
+Rscript code/29_shape_subregion_volumes_sensitivity.R 10000 20260905 6
 Rscript code/26_volume_only_mediation.R 10000 20260905 6
 ```
 

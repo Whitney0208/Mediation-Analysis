@@ -126,7 +126,7 @@ Total CC volume (the sum of the five FreeSurfer subregions divided by ICV) was a
 | `rs4639533` | 1.131 (0.993-1.317) | 1.003 (0.989-1.051) | 1.133 (0.994-1.322) |
 | `rs2515029` | 0.952 (0.856-1.048) | 0.996 (0.951-1.015) | 0.948 (0.853-1.048) |
 
-CC volume did not mediate any SNP effect, and adding it left the shape-mediated effects essentially unchanged. The mediation signal therefore reflects CC shape rather than CC size. The conclusions were the same when ICV was entered as a covariate instead of dividing by it, and under the wild bootstrap the shape-mediated effects followed the same pattern as in the shape-only model. A separate volume-only analysis, with the five subregion volumes as joint or single mediators as in S-GMAS, found no joint volumetric indirect effect; one of 20 single-region tests excluded 1, consistent with chance.
+CC volume did not mediate any SNP effect, and adding it left the shape-mediated effects essentially unchanged. The mediation signal therefore reflects CC shape rather than CC size. The conclusions were the same when ICV was entered as a covariate instead of dividing by it, when the five subregion volumes replaced total volume alongside shape, and under the wild bootstrap, where the shape-mediated effects followed the same pattern as in the shape-only model. A separate volume-only analysis, with the five subregion volumes as joint or single mediators as in S-GMAS, found no joint volumetric indirect effect; one of 20 single-region tests excluded 1, consistent with chance.
 
 ## Current conclusion
 
