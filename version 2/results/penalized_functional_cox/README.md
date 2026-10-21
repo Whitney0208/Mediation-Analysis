@@ -180,7 +180,11 @@ The simultaneous 95% band is $\widehat{\mathrm{SAIE}}(s) \pm c\,\widehat{\mathrm
 | `rs4639533` | s = 0.08 | 2.01 | -0.16 to 5.74 |
 | `rs2515029` | s = 0.09 | -1.35 | -4.12 to 0.11 |
 
-All four SNPs have their largest contribution in the same contour segment (s near 0.08), with signs that match their overall indirect effects. However, neither the simultaneous band nor the pointwise intervals excluded 0 at any of the 100 positions. The overall indirect effect integrates many small contributions of the same sign, whereas each position carries much less information and the simultaneous band controls error across all positions.
+All four SNPs have their largest contribution in the same contour segment (s near 0.08), with signs that match their overall indirect effects. However, neither the simultaneous band nor the pointwise intervals excluded 0 at any of the 100 positions.
+
+The same point estimates drawn on the mean contour, rebuilt from the sample-mean SRVF, locate this segment. The contour runs from s = 0 at the rounded end along the lower boundary to the hooked end (s = 0.5) and returns along the upper boundary. The peak lies on the lower boundary just past the rounded end. If the rounded and hooked ends are the splenium and genu, as their shapes suggest, the peak is on the ventral surface near the splenium, in the posterior CC; this orientation should be confirmed against the source landmarks.
+
+![SAIE on the mean contour](../penalized_functional_cox_saie/saie_on_mean_contour.png) The overall indirect effect integrates many small contributions of the same sign, whereas each position carries much less information and the simultaneous band controls error across all positions.
 
 ## Limitations
 
@@ -212,6 +216,7 @@ All four SNPs have their largest contribution in the same contour segment (s nea
 | [`basis_dimension_check.csv`](../penalized_functional_cox_diagnostics/basis_dimension_check.csv) | Estimates and EDFs with 10, 20, and 30 basis functions |
 | [`saie_summary_B10000_seed20260905_k20.csv`](../penalized_functional_cox_saie/saie_summary_B10000_seed20260905_k20.csv) | SAIE(s), pointwise intervals, and simultaneous band at each position |
 | [`saie_band_summary_B10000_seed20260905_k20.csv`](../penalized_functional_cox_saie/saie_band_summary_B10000_seed20260905_k20.csv) | Simultaneous critical values and the number of positions excluding 0 |
+| [`saie_on_mean_contour.png`](../penalized_functional_cox_saie/saie_on_mean_contour.png) | SAIE point estimates drawn on the mean CC contour |
 
 The error and warning files in the bootstrap folders contain no failed replicates and no warnings.
 
@@ -228,6 +233,7 @@ Rscript code/18_bootstrap_penalized_functional_cox.R 10000 20260905 6
 Rscript code/19_bca_penalized_functional_cox.R 10000 20260905 6
 Rscript code/24_check_penalized_cox_assumptions.R
 Rscript code/25_saie_penalized_functional_cox.R 10000 20260905 6
+Rscript code/30_plot_saie_on_contour.R
 ```
 
 The full mediation analysis overview is available in [`../README.md`](../README.md).
