@@ -148,19 +148,22 @@ penalized_cox_ridge_form <- function(penalized_fit) {
 }
 
 # Penalized Cox fit with subject weights at fixed smoothing parameters.
+# Optional scalar mediators enter as unpenalized linear terms, as in
+# fit_penalized_functional_cox.
 fit_weighted_penalized_cox <- function(
   x,
   W_matrix,
   subject_data,
   ridge_form,
-  subject_weights
+  subject_weights,
+  scalar_mediators = NULL
 ) {
   W_cox <- W_matrix[, setdiff(colnames(W_matrix), "intercept"), drop = FALSE]
   cox_data <- data.frame(
     time = as.numeric(subject_data$time),
     event = as.integer(subject_data$event)
   )
-  cox_data$scalar <- cbind(SNP = as.numeric(x), W_cox)
+  cox_data$scalar <- cbind(SNP = as.numeric(x), W_cox, scalar_mediators)
   cox_data$null_1 <- ridge_form[[1L]]$null_columns
   cox_data$null_2 <- ridge_form[[2L]]$null_columns
   cox_data$penalized_1 <- ridge_form[[1L]]$penalized_columns
@@ -196,9 +199,18 @@ fit_weighted_penalized_cox <- function(
     as.numeric(form$basis_at_grid %*% spline_coef)
   }, numeric(nrow(ridge_form[[1L]]$basis_at_grid)))
   colnames(beta) <- c("coordinate_1", "coordinate_2")
+  mediator_coefficients <- if (is.null(scalar_mediators)) {
+    NULL
+  } else {
+    stats::setNames(
+      coefficients[paste0("scalar", colnames(scalar_mediators))],
+      colnames(scalar_mediators)
+    )
+  }
 
   list(
     tau = unname(coefficients["scalarSNP"]),
+    mediator_coefficients = mediator_coefficients,
     beta = beta,
     warnings = unique(fit_warnings)
   )

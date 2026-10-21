@@ -93,6 +93,25 @@ Under the percentile interval, the `rs4639533` shape and total indirect effects 
 
 For `rs4639533`, the BCa interval for the volume pathway is shifted relative to the percentile interval ($z_0 = 0.43$). The product of two near-zero coefficients has a sharply peaked bootstrap distribution, for which BCa corrections are less reliable. All volume-pathway intervals include 1 under every interval type.
 
+## Wild Bootstrap
+
+For direct comparison with the wild bootstrap of the main model, the same model was also analyzed with the multiplier wild bootstrap: 10,000 replicates with seed `20260920` (the same Exp(1) subject weights as the main-model wild bootstrap), weights applied to the shape layer, the volume regression, and the penalized Cox layer, and smoothing parameters held at their full-data REML values. BCa acceleration used 332 leave-one-subject-out fits with the same fixed smoothing parameters. No replicate failed and no fit produced a warning.
+
+| SNP | Effect | Basic | Percentile | BCa | Pairs BCa (for reference) |
+|---|---|---:|---:|---:|---:|
+| `rs929708` | Through shape | 0.980-1.192 | **1.000-1.217** | **1.002-1.219** | 0.981-1.223 |
+| | Total indirect | 0.977-1.196 | 0.995-1.217 | 0.996-1.219 | 0.976-1.221 |
+| `rs11719939` | Through shape | 0.980-1.187 | 0.997-1.207 | 1.000-1.212 | 0.972-1.213 |
+| | Total indirect | 0.977-1.192 | 0.991-1.209 | 0.994-1.213 | 0.967-1.215 |
+| `rs4639533` | Through shape | 0.986-1.262 | **1.013-1.296** | **1.016-1.301** | 0.993-1.317 |
+| | Total indirect | 0.988-1.272 | **1.010-1.300** | **1.015-1.307** | 0.994-1.322 |
+| `rs2515029` | Through shape | 0.878-1.052 | 0.861-1.032 | 0.863-1.034 | 0.856-1.048 |
+| | Total indirect | 0.872-1.049 | 0.857-1.031 | 0.859-1.032 | 0.853-1.048 |
+
+Values are HRs with 95% intervals; bold intervals exclude 1. Exact lower bounds that round to 1.000: `rs929708` shape percentile 1.0003 (excludes 1), `rs11719939` shape BCa 0.9997 (includes 1). The volume pathway remained null under every interval (indirect HRs 0.996 to 1.003), and every direct- and total-effect interval included 1.
+
+The pattern matches the shape-only model: under the wild percentile and BCa intervals, the shape-mediated effects of `rs4639533` and `rs929708` exclude 1, whereas the basic intervals and the pairs-bootstrap BCa intervals include 1. Because the wild bootstrap does not propagate smoothing-parameter uncertainty, its standard errors were 12% to 15% smaller than the pairs-bootstrap standard errors for the shape and total indirect effects, so the pairs bootstrap remains the primary analysis.
+
 ## Sensitivity: ICV as a Covariate
 
 The main version divides total CC volume by ICV. In this sensitivity analysis, the mediator is the raw total CC volume (standardized), and standardized ICV is added to the adjustment set of every equation in both layers. The bootstrap design is identical (10,000 pairs replicates, seed `20260905`, BCa from 332 jackknife fits; two warning-flagged fits excluded).
@@ -132,6 +151,9 @@ Values are indirect HRs with 95% BCa intervals. No joint volumetric indirect eff
 | [`bootstrap_estimates_B10000_seed20260905_k20.csv`](../shape_volume_mediation_bootstrap/bootstrap_estimates_B10000_seed20260905_k20.csv) | Replicate-level estimates, including both path coefficients |
 | [`jackknife_estimates_n332_k20.csv`](../shape_volume_mediation_bootstrap/jackknife_estimates_n332_k20.csv) | Leave-one-subject-out estimates for the BCa acceleration |
 | [`bootstrap_warnings_B10000_seed20260905_k20.csv`](../shape_volume_mediation_bootstrap/bootstrap_warnings_B10000_seed20260905_k20.csv) | The two warning-flagged Cox fits |
+| [`wild_bootstrap_summary_B10000_seed20260920_k20.csv`](../shape_volume_wild_bootstrap/wild_bootstrap_summary_B10000_seed20260920_k20.csv) | Wild bootstrap: standard errors, $z_0$, acceleration, basic, percentile, and BCa intervals |
+| [`wild_bootstrap_estimates_B10000_seed20260920_k20.csv`](../shape_volume_wild_bootstrap/wild_bootstrap_estimates_B10000_seed20260920_k20.csv) | Replicate-level wild bootstrap estimates |
+| [`fixed_smoothing_jackknife_n332_k20.csv`](../shape_volume_wild_bootstrap/fixed_smoothing_jackknife_n332_k20.csv) | Leave-one-subject-out estimates for the wild BCa acceleration |
 | [`bootstrap_summary_B10000_seed20260905_k20.csv`](../shape_volume_icv_covariate_bootstrap/bootstrap_summary_B10000_seed20260905_k20.csv) | ICV-covariate sensitivity: point estimates and intervals |
 | [`bootstrap_summary_B10000_seed20260905.csv`](../volume_only_mediation/bootstrap_summary_B10000_seed20260905.csv) | Volume-only mediation: joint and single-region indirect effects with BCa and percentile intervals |
 | [`volume_only_point_estimates.csv`](../volume_only_mediation/volume_only_point_estimates.csv) | Volume-only point estimates |
@@ -143,6 +165,7 @@ Run from the `version 2` directory. The last argument of scripts 23, 26, and 27 
 ```bash
 Rscript code/22_fit_shape_volume_mediation.R
 Rscript code/23_bootstrap_shape_volume_mediation.R 10000 20260905 6
+Rscript code/28_wild_bootstrap_shape_volume.R 10000 20260920
 Rscript code/27_shape_volume_icv_covariate.R 10000 20260905 6
 Rscript code/26_volume_only_mediation.R 10000 20260905 6
 ```
