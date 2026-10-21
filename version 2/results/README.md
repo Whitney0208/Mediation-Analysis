@@ -42,6 +42,8 @@ Indirect-effect intervals under all bootstrap and interval types:
 
 Both bootstraps used 10,000 replicates. The wild bootstrap held the smoothing parameters fixed, whereas the pairs bootstrap reselected them by REML in every replicate. Relative to the FLCRM, the indirect-effect standard error fell by 16% to 29% under the pairs bootstrap. The indirect effects of `rs4639533` and `rs929708` excluded HR = 1 under the wild percentile and BCa intervals, but no indirect effect excluded 1 under the pairs BCa interval. Every direct- and total-effect interval included 1.
 
+Model checks found no violation of proportional hazards for the SNP or the shape term and no SNP x shape interaction. APOE4 violated proportional hazards, but an APOE4-stratified refit left the indirect effects unchanged. The spatial indirect effect SAIE(s) peaked near contour position s = 0.08 for all four SNPs, with signs matching their overall indirect effects, but no position had a simultaneous or pointwise 95% interval excluding 0. Details are in the [standalone summary](penalized_functional_cox/README.md#model-diagnostics).
+
 ## Original FLCRM analysis (comparison model)
 
 The sections below summarize the original functional linear Cox regression model, whose second layer uses the first `K = 18` joint FPCs of the two shape coordinates. It is retained as a comparison model.
@@ -124,7 +126,7 @@ Total CC volume (the sum of the five FreeSurfer subregions divided by ICV) was a
 | `rs4639533` | 1.131 (0.993-1.317) | 1.003 (0.989-1.051) | 1.133 (0.994-1.322) |
 | `rs2515029` | 0.952 (0.856-1.048) | 0.996 (0.951-1.015) | 0.948 (0.853-1.048) |
 
-CC volume did not mediate any SNP effect, and adding it left the shape-mediated effects essentially unchanged. The mediation signal therefore reflects CC shape rather than CC size.
+CC volume did not mediate any SNP effect, and adding it left the shape-mediated effects essentially unchanged. The mediation signal therefore reflects CC shape rather than CC size. The conclusions were the same when ICV was entered as a covariate instead of dividing by it. A separate volume-only analysis, with the five subregion volumes as joint or single mediators as in S-GMAS, found no joint volumetric indirect effect; one of 20 single-region tests excluded 1, consistent with chance.
 
 ## Current conclusion
 

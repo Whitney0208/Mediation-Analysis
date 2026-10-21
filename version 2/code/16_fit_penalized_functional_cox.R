@@ -39,7 +39,8 @@ basis_sizes <- c(10L, 20L, 30L)
 #   h(t) = h0(t) exp[tau X + kappa' W + sum_j integral M_j(s) beta_j(s) ds].
 # Each beta_j(s) is a penalized spline; the integral uses trapezoid weights and
 # the smoothing parameters are chosen by REML. Optional scalar mediators (a
-# named n x q matrix) enter the hazard as unpenalized linear terms.
+# named n x q matrix) enter the hazard as unpenalized linear terms. Optional
+# strata give each stratum its own baseline hazard.
 fit_penalized_functional_cox <- function(
   x,
   W_matrix,
@@ -47,7 +48,8 @@ fit_penalized_functional_cox <- function(
   shape_array,
   shape_grid,
   basis_size = main_basis_size,
-  scalar_mediators = NULL
+  scalar_mediators = NULL,
+  strata = NULL
 ) {
   n_subjects <- dim(shape_array)[1L]
   p_grid <- length(shape_grid)
@@ -63,6 +65,10 @@ fit_penalized_functional_cox <- function(
     m1 = sweep(shape_array[, , 1L], 2L, weights_grid, FUN = "*"),
     m2 = sweep(shape_array[, , 2L], 2L, weights_grid, FUN = "*")
   )
+  if (!is.null(strata)) {
+    # mgcv::cox.ph takes stratified data as a two-column response: time, stratum.
+    cox_data$time <- cbind(cox_data$time, as.numeric(factor(strata)))
+  }
   fit <- mgcv::gam(
     time ~ scalar +
       s(s1, by = m1, bs = "ps", k = basis_size) +

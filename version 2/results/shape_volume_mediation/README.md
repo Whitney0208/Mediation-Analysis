@@ -93,6 +93,35 @@ Under the percentile interval, the `rs4639533` shape and total indirect effects 
 
 For `rs4639533`, the BCa interval for the volume pathway is shifted relative to the percentile interval ($z_0 = 0.43$). The product of two near-zero coefficients has a sharply peaked bootstrap distribution, for which BCa corrections are less reliable. All volume-pathway intervals include 1 under every interval type.
 
+## Sensitivity: ICV as a Covariate
+
+The main version divides total CC volume by ICV. In this sensitivity analysis, the mediator is the raw total CC volume (standardized), and standardized ICV is added to the adjustment set of every equation in both layers. The bootstrap design is identical (10,000 pairs replicates, seed `20260905`, BCa from 332 jackknife fits; two warning-flagged fits excluded).
+
+| SNP | Through shape: ratio | Through shape: ICV covariate | Total indirect: ratio | Total indirect: ICV covariate |
+|---|---:|---:|---:|---:|
+| `rs929708` | 1.092 (0.981-1.223) | 1.084 (0.972-1.215) | 1.091 (0.976-1.221) | 1.079 (0.962-1.213) |
+| `rs11719939` | 1.088 (0.972-1.213) | 1.079 (0.962-1.202) | 1.087 (0.967-1.215) | 1.073 (0.953-1.201) |
+| `rs4639533` | 1.131 (0.993-1.317) | 1.134 (1.000-1.311) | 1.133 (0.994-1.322) | 1.136 (0.997-1.315) |
+| `rs2515029` | 0.952 (0.856-1.048) | 0.955 (0.857-1.052) | 0.948 (0.853-1.048) | 0.951 (0.853-1.053) |
+
+Values are HRs with 95% BCa intervals. The volume pathway remained null (indirect HRs 0.995 to 1.002), and direct and total effects were essentially unchanged. The shape indirect effect of `rs4639533` had a BCa lower bound of 1.0004 in this version, compared with 0.993 in the ratio version, so the borderline status of this SNP does not depend on how ICV is handled.
+
+## Volume-Only Mediation (Comparison with S-GMAS)
+
+To compare directly with the volumetric analysis of S-GMAS, a separate model used CC volumes as the only mediators, without the shape term. Each of the five subregion volumes was divided by ICV and standardized. The second layer is an ordinary Cox model, and the bootstrap design matches the main analysis (10,000 pairs replicates, seed `20260905`, BCa from 332 jackknife fits; 8 of 40,000 replicate-level fits produced Cox warnings and were excluded).
+
+- **Joint model.** All five subregions enter together: $V_r = a_r X + c_r^\top W + e_r$ and $h(t) = h_0(t)\exp[\tau X + \kappa^\top W + \sum_r b_r V_r]$, with indirect effect $\sum_r a_r b_r$.
+- **Single-region models.** One model per subregion, with indirect effect $a_r b_r$.
+
+| SNP | Joint indirect | Anterior | Mid-anterior | Central | Mid-posterior | Posterior |
+|---|---:|---:|---:|---:|---:|---:|
+| `rs929708` | 1.016 (0.927-1.105) | 0.981 (0.925-1.004) | 1.003 (0.963-1.051) | 1.005 (0.938-1.064) | 1.017 (0.971-1.081) | 0.998 (0.968-1.010) |
+| `rs11719939` | 0.982 (0.884-1.065) | 0.984 (0.927-1.010) | 0.999 (0.950-1.045) | 0.998 (0.918-1.060) | 0.998 (0.940-1.049) | 1.002 (0.988-1.036) |
+| `rs4639533` | 1.056 (0.972-1.180) | 0.999 (0.953-1.039) | 1.020 (0.982-1.090) | 1.052 (0.995-1.148) | 1.027 (0.985-1.104) | 1.004 (0.992-1.043) |
+| `rs2515029` | 0.966 (0.898-1.037) | 0.995 (0.957-1.020) | **0.965 (0.911-0.997)** | 0.963 (0.903-1.004) | 0.970 (0.914-1.003) | 0.994 (0.954-1.008) |
+
+Values are indirect HRs with 95% BCa intervals. No joint volumetric indirect effect excluded 1. One of the 20 single-region tests (`rs2515029`, mid-anterior; bold) excluded 1, which is about the number expected by chance at the 5% level, and it would not survive a Bonferroni correction for 20 tests (threshold 0.0025). This agrees with S-GMAS, which found no mediation through either the total or the individual CC subregion volumes.
+
 ## Output Files
 
 | File | Content |
@@ -103,14 +132,19 @@ For `rs4639533`, the BCa interval for the volume pathway is shifted relative to 
 | [`bootstrap_estimates_B10000_seed20260905_k20.csv`](../shape_volume_mediation_bootstrap/bootstrap_estimates_B10000_seed20260905_k20.csv) | Replicate-level estimates, including both path coefficients |
 | [`jackknife_estimates_n332_k20.csv`](../shape_volume_mediation_bootstrap/jackknife_estimates_n332_k20.csv) | Leave-one-subject-out estimates for the BCa acceleration |
 | [`bootstrap_warnings_B10000_seed20260905_k20.csv`](../shape_volume_mediation_bootstrap/bootstrap_warnings_B10000_seed20260905_k20.csv) | The two warning-flagged Cox fits |
+| [`bootstrap_summary_B10000_seed20260905_k20.csv`](../shape_volume_icv_covariate_bootstrap/bootstrap_summary_B10000_seed20260905_k20.csv) | ICV-covariate sensitivity: point estimates and intervals |
+| [`bootstrap_summary_B10000_seed20260905.csv`](../volume_only_mediation/bootstrap_summary_B10000_seed20260905.csv) | Volume-only mediation: joint and single-region indirect effects with BCa and percentile intervals |
+| [`volume_only_point_estimates.csv`](../volume_only_mediation/volume_only_point_estimates.csv) | Volume-only point estimates |
 
 ## Reproduction
 
-Run from the `version 2` directory. The last argument of script 23 is the number of CPU cores.
+Run from the `version 2` directory. The last argument of scripts 23, 26, and 27 is the number of CPU cores.
 
 ```bash
 Rscript code/22_fit_shape_volume_mediation.R
 Rscript code/23_bootstrap_shape_volume_mediation.R 10000 20260905 6
+Rscript code/27_shape_volume_icv_covariate.R 10000 20260905 6
+Rscript code/26_volume_only_mediation.R 10000 20260905 6
 ```
 
 The full mediation analysis overview is available in [`../README.md`](../README.md).

@@ -141,16 +141,55 @@ Under the pairs bootstrap, the distribution lies to the right of the point estim
 
 These results are model-based associations and do not by themselves establish causal mediation.
 
+## Model Diagnostics
+
+The fitted functional term $\sum_j \int M_j(s)\hat\beta_j(s)\,ds$ was summarized as one shape score per participant and entered into a standard Cox model with the SNP and confounders. The tests therefore condition on the estimated $\beta_j(s)$.
+
+| Check | Result |
+|---|---|
+| Proportional hazards, SNP (scaled Schoenfeld residuals) | p = 0.68 to 0.88 across the four SNP models |
+| Proportional hazards, shape score | p = 0.66 |
+| Proportional hazards, APOE4 | p = 0.005 (violated) |
+| Proportional hazards, global | p = 0.07 |
+| SNP x shape-score interaction (likelihood ratio test) | p = 0.32 to 0.68 |
+| Number of basis functions | Estimates unchanged with 10, 20, or 30 basis functions (`mgcv::k.check` is unavailable for `cox.ph`) |
+
+Because APOE4 violated proportional hazards, the second layer was refitted with a separate baseline hazard for each APOE4 genotype (stratified Cox; smoothing parameters reselected by REML). The indirect effects were essentially unchanged:
+
+| SNP | Indirect HR, main | Indirect HR, APOE4-stratified | Direct HR, main | Direct HR, APOE4-stratified |
+|---|---:|---:|---:|---:|
+| `rs929708` | 1.095 | 1.097 | 0.840 | 0.811 |
+| `rs11719939` | 1.091 | 1.091 | 0.997 | 0.952 |
+| `rs4639533` | 1.135 | 1.132 | 0.864 | 0.875 |
+| `rs2515029` | 0.950 | 0.951 | 1.008 | 0.990 |
+
+No exposure-mediator interaction was detected, which supports the product-of-coefficients form of the indirect effect.
+
+## Spatial Indirect Effect
+
+The spatial indirect effect $\mathrm{SAIE}(s) = \sum_j \alpha_j(s)\beta_j(s)$ shows where along the contour the indirect effect accumulates; its trapezoid integral equals the indirect log HR. Uncertainty was estimated by rerunning the pairs bootstrap with the same 10,000 subject indices and storing $\mathrm{SAIE}^*_b(s)$. The integrals of the replicate curves reproduced the stored indirect effects to within 1e-15.
+
+The simultaneous 95% band is $\widehat{\mathrm{SAIE}}(s) \pm c\,\widehat{\mathrm{sd}}(s)$, where $\widehat{\mathrm{sd}}(s)$ is the pointwise bootstrap standard deviation and $c$ is the 95th percentile of $\max_s |\mathrm{SAIE}^*_b(s) - \widehat{\mathrm{SAIE}}(s)| / \widehat{\mathrm{sd}}(s)$ ($c$ = 4.30 to 4.45). This differs from the S-GMAS code, which takes the maximum over $s$ of pointwise quantiles and therefore does not guarantee 95% simultaneous coverage.
+
+![Spatial indirect effect](../penalized_functional_cox_saie/saie_B10000_seed20260905_k20.png)
+
+| SNP | Location of largest \|SAIE\| | SAIE at that location | Pointwise 95% interval there |
+|---|---:|---:|---:|
+| `rs929708` | s = 0.08 | 1.65 | -0.31 to 4.74 |
+| `rs11719939` | s = 0.09 | 1.26 | -0.23 to 4.04 |
+| `rs4639533` | s = 0.08 | 2.01 | -0.16 to 5.74 |
+| `rs2515029` | s = 0.09 | -1.35 | -4.12 to 0.11 |
+
+All four SNPs have their largest contribution in the same contour segment (s near 0.08), with signs that match their overall indirect effects. However, neither the simultaneous band nor the pointwise intervals excluded 0 at any of the 100 positions. The overall indirect effect integrates many small contributions of the same sign, whereas each position carries much less information and the simultaneous band controls error across all positions.
+
 ## Limitations
 
 - **Smoothing-parameter uncertainty.** The wild bootstrap does not propagate uncertainty in smoothing-parameter selection. The pairs bootstrap does.
 - **Coordinate-specific contributions.** The two contributions have opposite signs and are negatively correlated across wild replicates (r = -0.62 to -0.71). Coordinate-level interpretation should be cautious.
 - **Rotation invariance.** Separate smoothing parameters for the two coordinates make the fit depend on the orientation of the SRVF coordinate system. Sharing one smoothing parameter across coordinates would remove this dependence.
 - **Product method under Cox.** Event incidence is high (145 of 332, 44%). Because the HR is non-collapsible, the product-of-coefficients indirect effect on the Cox scale is only an approximation unless the outcome is rare (VanderWeele, 2011). A functional accelerated failure time model, under which the product method holds exactly, would be a natural complementary analysis.
-- **Unchecked assumptions.** Proportional hazards and the absence of an exposure-mediator interaction have not yet been checked.
+- **Proportional hazards for APOE4.** APOE4 violated proportional hazards. An APOE4-stratified refit left the indirect effects unchanged.
 - **Analysis history and multiplicity.** This model was adopted after several alternative second-layer specifications had been examined. The intervals are not adjusted for testing four SNPs. The procedure used to select the four SNPs should be documented, because selection on shape association in the same data would inflate the first-layer estimates.
-- **Not yet estimated.** The spatial indirect effect $\mathrm{SAIE}(s) = \sum_j \alpha_j(s)\beta_j(s)$ and its simultaneous confidence band.
-
 ## Output Files
 
 | File | Content |
@@ -167,12 +206,18 @@ These results are model-based associations and do not by themselves establish ca
 | [`bootstrap_estimates_B10000_seed20260905_k20.csv`](../penalized_functional_cox_bootstrap/bootstrap_estimates_B10000_seed20260905_k20.csv) | Replicate-level pairs bootstrap estimates, including the reselected EDFs |
 | [`bca_summary_B10000_seed20260905_k20.csv`](../penalized_functional_cox_bca/bca_summary_B10000_seed20260905_k20.csv) | Pairs bootstrap BCa, percentile, and basic intervals with $z_0$ and $a$ |
 | [`jackknife_estimates_n332_k20.csv`](../penalized_functional_cox_bca/jackknife_estimates_n332_k20.csv) | Leave-one-subject-out estimates for the pairs BCa acceleration |
+| [`proportional_hazards_tests.csv`](../penalized_functional_cox_diagnostics/proportional_hazards_tests.csv) | Schoenfeld-residual tests for every term and the global test |
+| [`snp_shape_interaction_tests.csv`](../penalized_functional_cox_diagnostics/snp_shape_interaction_tests.csv) | SNP x shape-score interaction tests |
+| [`apoe4_stratified_sensitivity.csv`](../penalized_functional_cox_diagnostics/apoe4_stratified_sensitivity.csv) | Main versus APOE4-stratified estimates |
+| [`basis_dimension_check.csv`](../penalized_functional_cox_diagnostics/basis_dimension_check.csv) | Estimates and EDFs with 10, 20, and 30 basis functions |
+| [`saie_summary_B10000_seed20260905_k20.csv`](../penalized_functional_cox_saie/saie_summary_B10000_seed20260905_k20.csv) | SAIE(s), pointwise intervals, and simultaneous band at each position |
+| [`saie_band_summary_B10000_seed20260905_k20.csv`](../penalized_functional_cox_saie/saie_band_summary_B10000_seed20260905_k20.csv) | Simultaneous critical values and the number of positions excluding 0 |
 
 The error and warning files in the bootstrap folders contain no failed replicates and no warnings.
 
 ## Reproduction
 
-Run the following commands from the `version 2` directory. The last argument of scripts 18 and 19 is the number of CPU cores.
+Run the following commands from the `version 2` directory. The last argument of scripts 18, 19, and 25 is the number of CPU cores.
 
 ```bash
 Rscript code/16_fit_penalized_functional_cox.R
@@ -181,6 +226,8 @@ Rscript code/17_wild_bootstrap_penalized_functional_cox.R 10000 20260920
 Rscript code/20_bca_wild_penalized_functional_cox.R 10000 20260920
 Rscript code/18_bootstrap_penalized_functional_cox.R 10000 20260905 6
 Rscript code/19_bca_penalized_functional_cox.R 10000 20260905 6
+Rscript code/24_check_penalized_cox_assumptions.R
+Rscript code/25_saie_penalized_functional_cox.R 10000 20260905 6
 ```
 
 The full mediation analysis overview is available in [`../README.md`](../README.md).
