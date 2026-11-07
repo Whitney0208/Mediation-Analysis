@@ -1,0 +1,13 @@
+"quantity","value"
+"Observed time, median",735
+"Observed time, 25th percentile",418.75
+"Observed time, 75th percentile",1102
+"Observed time, minimum",154
+"Observed time, maximum",1695
+"Median follow-up, reverse Kaplan-Meier",1099
+"Median time to conversion, Kaplan-Meier",1121
+"Median time to conversion, lower 95% limit",1094
+"Median time to conversion, upper 95% limit",NA
+"Cumulative conversion at time 365",0.105472389137376
+"Cumulative conversion at time 730",0.347322421598233
+"Cumulative conversion at time 1095",0.448196083063364

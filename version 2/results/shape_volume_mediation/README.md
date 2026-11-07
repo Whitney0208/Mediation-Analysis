@@ -110,7 +110,7 @@ For direct comparison with the wild bootstrap of the main model, the same model 
 
 Values are HRs with 95% intervals; bold intervals exclude 1. Exact lower bounds that round to 1.000: `rs929708` shape percentile 1.0003 (excludes 1), `rs11719939` shape BCa 0.9997 (includes 1). The volume pathway remained null under every interval (indirect HRs 0.996 to 1.003), and every direct- and total-effect interval included 1.
 
-The pattern matches the shape-only model: under the wild percentile and BCa intervals, the shape-mediated effects of `rs4639533` and `rs929708` exclude 1, whereas the basic intervals and the pairs-bootstrap BCa intervals include 1. Because the wild bootstrap does not propagate smoothing-parameter uncertainty, its standard errors were 12% to 15% smaller than the pairs-bootstrap standard errors for the shape and total indirect effects, so the pairs bootstrap remains the primary analysis.
+The pattern matches the shape-only model: under the wild percentile and BCa intervals, the shape-mediated effects of `rs4639533` and `rs929708` exclude 1, whereas the basic intervals and the pairs-bootstrap BCa intervals include 1. Because the wild bootstrap does not propagate smoothing-parameter uncertainty, its standard errors were 10% to 16% smaller than the pairs-bootstrap standard errors for the shape and total indirect effects, so the pairs-bootstrap intervals are reported alongside the wild intervals as a sensitivity analysis.
 
 ## Sensitivity: ICV as a Covariate
 

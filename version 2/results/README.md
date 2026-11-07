@@ -22,7 +22,7 @@ A standalone English summary is available in [`penalized_functional_cox/README.m
 
 The main analysis fits the second layer without FPCA truncation, following the penalized scalar-on-function approach of S-GMAS. Each shape coefficient `beta_j(s)` uses 20 cubic P-spline basis functions with a second-order difference penalty, and the smoothing parameters are selected by REML. The first layer is unchanged. The shape term uses about 5.7 effective degrees of freedom instead of 18 FPC coefficients, and the estimates were insensitive to the number of basis functions.
 
-The primary intervals are pairs-bootstrap BCa intervals (10,000 subject-level resamples, smoothing parameters reselected by REML in every replicate). Hazard ratios are per one additional coded allele.
+The manuscript Results draft ([`../manuscript/results_draft.md`](../manuscript/results_draft.md)) uses the multiplier wild-bootstrap BCa interval as the primary interval and reports the pairs-bootstrap BCa interval as a sensitivity analysis. The table below shows the pairs-bootstrap BCa intervals (10,000 subject-level resamples, smoothing parameters reselected by REML in every replicate), and the second table gives every interval type. Hazard ratios are per one additional coded allele.
 
 | SNP | Direct HR (95% BCa CI) | Indirect HR (95% BCa CI) | Total HR (95% BCa CI) |
 |---|---:|---:|---:|
@@ -113,6 +113,23 @@ The analysis was repeated with `K = 8`, 10, 12, 15, and 18. The direction of the
 
 All fixed-K bootstrap 95% CIs for the indirect HR included 1. Increasing K raised the retained shape variance from 66.62% at K = 8 to 85.98% at K = 18, and the C-index increased from approximately 0.644-0.647 to approximately 0.664-0.667. The qualitative direction of the mediation estimates was stable, while uncertainty remained substantial.
 
+### Global tests of the two mediation paths
+
+Both paths of the main model were tested over the whole contour with Freedman-Lane permutation tests (10,000 permutations, subjects permuted as whole residual curves). The SNP-to-shape test uses the integrated squared pointwise t statistic over both coordinates, with the maximum absolute t statistic as a second statistic. The shape-to-hazard test uses the partial likelihood ratio of the penalized model, with the smoothing parameters reselected by REML in every permutation.
+
+| SNP | SNP -> shape, integrated p | Holm-adjusted p | SNP -> shape, maximum p | Shape -> hazard p |
+|---|---:|---:|---:|---:|
+| `rs929708` | 0.114 | 0.228 | 0.390 | < 0.001 |
+| `rs11719939` | 0.212 | 0.228 | 0.770 | < 0.001 |
+| `rs4639533` | 0.022 | 0.078 | 0.240 | < 0.001 |
+| `rs2515029` | 0.019 | 0.078 | 0.432 | < 0.001 |
+
+Shape is strongly associated with the hazard in every model, mainly through the first coordinate. The SNP-to-shape path is the weak link. Results are in [`penalized_functional_cox_path_tests/`](penalized_functional_cox_path_tests/) (script `32_test_mediation_paths.R`).
+
+### Sample description
+
+Baseline characteristics by conversion status, genotype counts with Hardy-Weinberg exact tests, linkage disequilibrium between the SNPs, and follow-up summaries are in [`baseline_characteristics/`](baseline_characteristics/) (script `31_summarize_baseline_characteristics.R`). All four SNPs are in Hardy-Weinberg equilibrium (p = 0.43 to 0.77). `rs929708` and `rs11719939` are in strong linkage disequilibrium (r2 = 0.75), so their results largely reflect one signal. The coded allele of `rs4639533` is the major allele (frequency 0.795).
+
 ## Supplementary analysis: CC shape and volume
 
 A standalone English summary is available in [`shape_volume_mediation/README.md`](shape_volume_mediation/README.md).
@@ -130,9 +147,9 @@ CC volume did not mediate any SNP effect, and adding it left the shape-mediated 
 
 ## Current conclusion
 
-The fitted models show directionally different SNP-specific mediation patterns. `rs929708` and `rs4639533` have opposing direct and shape-mediated pathways, `rs11719939` has concordant positive pathways, and `rs2515029` has concordant negative pathways. These directions are stable across the penalized functional Cox model, the FLCRM, and the examined FPCA dimensions.
+`rs929708` and `rs4639533` have direct HRs below 1 and shape-mediated HRs above 1 in both the penalized functional Cox model and the FLCRM. The directions of the indirect effects are the same in both models. The direct effects of `rs11719939` and `rs2515029` are close to 1 in the penalized model (HR 0.997 and 1.008), so their direct-path direction is not stable across models.
 
-In the main penalized functional Cox analysis, every pairs-bootstrap BCa interval includes HR = 1. `rs4639533` shows a borderline shape-mediated association (indirect HR 1.135, 95% BCa CI 0.997-1.322) whose significance depends on the resampling scheme and interval type, so the evidence is suggestive rather than robust. CC volume does not mediate any SNP effect, and the shape-mediated estimates are unchanged after accounting for it.
+Under the wild-bootstrap BCa interval, the shape-mediated effects of `rs4639533` (HR 1.135, 1.018-1.307) and `rs929708` (HR 1.095, 1.002-1.219) exclude 1. Under the pairs-bootstrap BCa interval, which also propagates smoothing-parameter uncertainty, every interval includes 1 (`rs4639533`: 0.997-1.322). `rs4639533` has the most consistent evidence, because it is also the SNP with both path tests below 0.05. Its SNP-to-shape test does not survive Holm correction across the four SNPs (p = 0.078), so the evidence is suggestive rather than robust. CC volume does not mediate any SNP effect, and the shape-mediated estimates are unchanged after accounting for it.
 
 These results are model-based associations. They do not establish a causal mediation pathway. Before final inference, the SNP coded-allele orientation and the prespecified handling of center and intracranial-volume effects should be documented.
 
@@ -1186,4 +1203,4 @@ The point estimates are in [`four_snp_effect_summary.csv`](four_snp_point_estima
 
 Complete model coefficient tables are available in [`four_snp_shape_coefficients.csv`](four_snp_point_estimates/four_snp_shape_coefficients.csv) and [`four_snp_cox_coefficients.csv`](four_snp_point_estimates/four_snp_cox_coefficients.csv). Separate per-SNP files are also provided for `rs929708`, `rs11719939`, `rs4639533`, and `rs2515029`.
 
-The penalized functional Cox results are in [`penalized_functional_cox/`](penalized_functional_cox/), [`penalized_functional_cox_wild_bootstrap/`](penalized_functional_cox_wild_bootstrap/), [`penalized_functional_cox_bootstrap/`](penalized_functional_cox_bootstrap/), and [`penalized_functional_cox_bca/`](penalized_functional_cox_bca/). The shape and volume results are in [`shape_volume_mediation/`](shape_volume_mediation/) and [`shape_volume_mediation_bootstrap/`](shape_volume_mediation_bootstrap/).
+The penalized functional Cox results are in [`penalized_functional_cox/`](penalized_functional_cox/), [`penalized_functional_cox_wild_bootstrap/`](penalized_functional_cox_wild_bootstrap/), [`penalized_functional_cox_bootstrap/`](penalized_functional_cox_bootstrap/), and [`penalized_functional_cox_bca/`](penalized_functional_cox_bca/). The shape and volume results are in [`shape_volume_mediation/`](shape_volume_mediation/) and [`shape_volume_mediation_bootstrap/`](shape_volume_mediation_bootstrap/). The global path tests are in [`penalized_functional_cox_path_tests/`](penalized_functional_cox_path_tests/), and the sample description is in [`baseline_characteristics/`](baseline_characteristics/). The draft Results section is [`../manuscript/results_draft.md`](../manuscript/results_draft.md).
